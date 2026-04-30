@@ -20,7 +20,7 @@ const ACCOUNTS = {
     name: process.env.HARSH_NAME || "Harsh",
   },
   spotify: {
-    label: "spotify",
+    label: "harsh111",
     user: process.env.SPOTIFY_EMAIL,
     pass: process.env.SPOTIFY_PASSWORD,
     name: process.env.SPOTIFY_NAME || "Spotify",
@@ -29,7 +29,7 @@ const ACCOUNTS = {
     label: "harsh111",
     user: process.env.HARSH111_EMAIL,
     pass: process.env.HARSH111_PASSWORD,
-    name: process.env.HARSH111_NAME || "Harsh111",
+    name: process.env.HARSH111_NAME || "harsh111",
   },
 };
 
