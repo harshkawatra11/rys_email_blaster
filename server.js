@@ -27,16 +27,6 @@ const ACCOUNTS = {
   },
 };
 
-// ── Expose account list to the UI (no secrets) ────────────────────────────
-app.get("/api/accounts", (req, res) => {
-  const safe = Object.entries(ACCOUNTS).map(([id, acc]) => ({
-    id,
-    label: acc.label,
-    email: acc.user,
-  }));
-  res.json(safe);
-});
-
 // ── Parse CSV uploaded by user ────────────────────────────────────────────
 app.post("/api/parse-csv", upload.single("csv"), (req, res) => {
   try {

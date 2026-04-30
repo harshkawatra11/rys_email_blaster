@@ -434,20 +434,18 @@ let state = {
   currentStep: 1,
 };
 
-// ── Init ──────────────────────────────────────────────────────────────────
-(async function init() {
-  try {
-    const res = await fetch('/api/accounts');
-    state.accounts = await res.json();
-    const sel = document.getElementById('accountSelect');
-    sel.innerHTML = '<option value="">— select an account —</option>';
-    state.accounts.forEach(acc => {
-      sel.innerHTML += `<option value="${acc.id}">${acc.label} — ${acc.email}</option>`;
-    });
-    sel.addEventListener('change', onAccountChange);
-  } catch (e) {
-    toast('Could not reach server. Is server.js running?', 'error');
-  }
+// ── Hardcoded accounts (no API call needed for a fixed list) ─────────────
+(function init() {
+  state.accounts = [
+    { id: 'harsh111',    label: 'harsh111',    email: 'harshkawatra111@gmail.com' },
+    { id: 'harshgdrive', label: 'harshgdrive', email: 'harshgdrive11@gmail.com'  },
+  ];
+  const sel = document.getElementById('accountSelect');
+  sel.innerHTML = '<option value="">— select an account —</option>';
+  state.accounts.forEach(acc => {
+    sel.innerHTML += `<option value="${acc.id}">${acc.label} — ${acc.email}</option>`;
+  });
+  sel.addEventListener('change', onAccountChange);
 })();
 
 // ── Step navigation ───────────────────────────────────────────────────────
