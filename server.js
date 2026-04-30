@@ -13,23 +13,17 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // ── Email account registry (loaded from .env) ─────────────────────────────
 const ACCOUNTS = {
-  harsh: {
-    label: "Harsh",
-    user: process.env.HARSH_EMAIL,
-    pass: process.env.HARSH_PASSWORD,
-    name: process.env.HARSH_NAME || "Harsh",
-  },
-  spotify: {
-    label: "harsh111",
-    user: process.env.SPOTIFY_EMAIL,
-    pass: process.env.SPOTIFY_PASSWORD,
-    name: process.env.SPOTIFY_NAME || "Spotify",
-  },
   harsh111: {
     label: "harsh111",
     user: process.env.HARSH111_EMAIL,
     pass: process.env.HARSH111_PASSWORD,
     name: process.env.HARSH111_NAME || "harsh111",
+  },
+  harshgdrive: {
+    label: "harshgdrive",
+    user: process.env.HARSHGDRIVE_EMAIL,
+    pass: process.env.HARSHGDRIVE_PASSWORD,
+    name: process.env.HARSHGDRIVE_NAME || "harshgdrive",
   },
 };
 
