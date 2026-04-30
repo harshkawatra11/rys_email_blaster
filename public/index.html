@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Email Blaster</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg:       #0a0a0f;
+    --surface:  #111118;
+    --border:   #1e1e2e;
+    --border2:  #2a2a3e;
+    --accent:   #7c6af7;
+    --accent2:  #4ade80;
+    --accent3:  #f97316;
+    --text:     #e2e2f0;
+    --muted:    #6b6b8a;
+    --danger:   #f43f5e;
+    --mono:     'IBM Plex Mono', monospace;
+    --display:  'Syne', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--mono);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+    overflow-x: hidden;
+  }
+
+  /* ── Grid noise texture ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%231e1e2e' stroke-width='0.5'%3E%3Cpath d='M60 0H0v60'/%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Header ── */
+  header {
+    position: relative; z-index: 1;
+    border-bottom: 1px solid var(--border);
+    padding: 20px 40px;
+    display: flex; align-items: center; gap: 16px;
+    background: linear-gradient(135deg, rgba(124,106,247,0.06) 0%, transparent 60%);
+  }
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  header h1 {
+    font-family: var(--display);
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  header h1 span { color: var(--accent); }
+  .header-sub {
+    margin-left: auto;
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ── Main layout ── */
+  main {
+    position: relative; z-index: 1;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* ── Steps ── */
+  .steps-bar {
+    display: flex; gap: 0; margin-bottom: 44px;
+    border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+  }
+  .step-item {
+    flex: 1; padding: 12px 16px;
+    display: flex; align-items: center; gap: 10px;
+    border-right: 1px solid var(--border);
+    font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--muted); background: var(--surface);
+    transition: all 0.2s;
+    cursor: default; user-select: none;
+  }
+  .step-item:last-child { border-right: none; }
+  .step-num {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--border2); display: flex; align-items: center; justify-content: center;
+    font-size: 0.65rem; font-weight: 600; flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .step-item.active { color: var(--text); background: rgba(124,106,247,0.08); }
+  .step-item.active .step-num { background: var(--accent); color: #fff; }
+  .step-item.done { color: var(--accent2); }
+  .step-item.done .step-num { background: rgba(74,222,128,0.15); color: var(--accent2); }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 20px;
+    animation: slideIn 0.25s ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .card-label {
+    font-size: 0.65rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 16px; font-weight: 600;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-label::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+
+  /* ── Form elements ── */
+  label { font-size: 0.75rem; color: var(--muted); display: block; margin-bottom: 6px; letter-spacing: 0.04em; }
+
+  select, input[type="text"], input[type="number"] {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    padding: 10px 14px;
+    border-radius: 7px;
+    outline: none;
+    transition: border-color 0.15s;
+    appearance: none;
+  }
+  select:focus, input:focus { border-color: var(--accent); }
+
+  .select-wrap { position: relative; }
+  .select-wrap::after {
+    content: '▾'; position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    color: var(--muted); pointer-events: none; font-size: 0.8rem;
+  }
+
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+  /* ── File drop zone ── */
+  .dropzone {
+    border: 2px dashed var(--border2);
+    border-radius: 10px; padding: 36px 20px;
+    text-align: center; cursor: pointer;
+    transition: all 0.2s; position: relative;
+    background: var(--bg);
+  }
+  .dropzone:hover, .dropzone.dragover {
+    border-color: var(--accent);
+    background: rgba(124,106,247,0.04);
+  }
+  .dropzone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .dropzone-icon { font-size: 2rem; margin-bottom: 10px; }
+  .dropzone-text { font-size: 0.8rem; color: var(--muted); }
+  .dropzone-text strong { color: var(--accent); }
+  .dropzone.loaded { border-color: var(--accent2); background: rgba(74,222,128,0.03); }
+  .dropzone.loaded .dropzone-icon::after { content: ' ✓'; color: var(--accent2); font-size: 1.2rem; }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--mono); font-size: 0.8rem; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 11px 22px; border-radius: 7px; border: none;
+    cursor: pointer; transition: all 0.15s; text-decoration: none;
+  }
+  .btn-primary {
+    background: var(--accent); color: #fff;
+  }
+  .btn-primary:hover { background: #6b59e8; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(124,106,247,0.3); }
+  .btn-primary:disabled { background: var(--border2); color: var(--muted); cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-ghost {
+    background: transparent; color: var(--muted); border: 1px solid var(--border2);
+  }
+  .btn-ghost:hover { color: var(--text); border-color: var(--muted); }
+  .btn-danger {
+    background: rgba(244,63,94,0.12); color: var(--danger); border: 1px solid rgba(244,63,94,0.2);
+  }
+  .btn-success {
+    background: rgba(74,222,128,0.12); color: var(--accent2); border: 1px solid rgba(74,222,128,0.2);
+  }
+  .btn-success:hover { background: rgba(74,222,128,0.2); }
+
+  .btn-group { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+
+  /* ── Preview table ── */
+  .table-wrap {
+    overflow-x: auto; border-radius: 8px; border: 1px solid var(--border);
+    max-height: 260px; overflow-y: auto;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+  thead th {
+    background: var(--border); padding: 8px 12px; text-align: left;
+    font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+    position: sticky; top: 0;
+  }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(124,106,247,0.04); }
+  tbody td { padding: 7px 12px; color: var(--text); }
+  tbody tr.selected-row { background: rgba(124,106,247,0.08); }
+  tbody tr.selected-row td:first-child { border-left: 2px solid var(--accent); }
+
+  /* ── Stats chips ── */
+  .stat-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+  .stat-chip {
+    background: var(--bg); border: 1px solid var(--border2);
+    border-radius: 6px; padding: 6px 14px;
+    font-size: 0.72rem; color: var(--muted);
+  }
+  .stat-chip strong { color: var(--text); }
+  .stat-chip.green { border-color: rgba(74,222,128,0.3); }
+  .stat-chip.green strong { color: var(--accent2); }
+  .stat-chip.purple { border-color: rgba(124,106,247,0.3); }
+  .stat-chip.purple strong { color: var(--accent); }
+
+  /* ── Log terminal ── */
+  .log-terminal {
+    background: #050508; border: 1px solid var(--border);
+    border-radius: 8px; padding: 16px;
+    font-size: 0.75rem; line-height: 1.7;
+    max-height: 280px; overflow-y: auto;
+    font-family: var(--mono);
+  }
+  .log-line { display: flex; gap: 10px; }
+  .log-time { color: var(--muted); flex-shrink: 0; }
+  .log-ok   { color: var(--accent2); }
+  .log-fail { color: var(--danger); }
+  .log-info { color: var(--accent); }
+  .log-warn { color: var(--accent3); }
+
+  /* ── Progress bar ── */
+  .progress-outer {
+    background: var(--border); border-radius: 4px; height: 6px; overflow: hidden; margin: 16px 0;
+  }
+  .progress-inner {
+    height: 100%; background: var(--accent); border-radius: 4px;
+    transition: width 0.3s ease;
+  }
+
+  /* ── Account badge ── */
+  .acc-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(124,106,247,0.12); border: 1px solid rgba(124,106,247,0.25);
+    border-radius: 20px; padding: 4px 12px;
+    font-size: 0.72rem; color: var(--accent);
+  }
+  .acc-dot {
+    width: 7px; height: 7px; border-radius: 50%; background: var(--accent2);
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; } 50% { opacity: 0.3; }
+  }
+
+  /* ── Toast ── */
+  #toast {
+    position: fixed; bottom: 30px; right: 30px;
+    padding: 12px 20px; border-radius: 8px;
+    font-size: 0.78rem; font-family: var(--mono);
+    transform: translateY(80px); opacity: 0;
+    transition: all 0.3s; z-index: 100;
+    max-width: 340px;
+  }
+  #toast.show { transform: translateY(0); opacity: 1; }
+  #toast.success { background: rgba(74,222,128,0.12); border: 1px solid var(--accent2); color: var(--accent2); }
+  #toast.error   { background: rgba(244,63,94,0.12);  border: 1px solid var(--danger);  color: var(--danger); }
+  #toast.info    { background: rgba(124,106,247,0.12); border: 1px solid var(--accent);  color: var(--accent); }
+
+  /* ── Spinner ── */
+  .spinner {
+    width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.2);
+    border-top-color: currentColor; border-radius: 50%;
+    animation: spin 0.6s linear infinite; display: inline-block;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .hidden { display: none !important; }
+  .mt-12 { margin-top: 12px; }
+  .mt-20 { margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-icon">✉</div>
+  <h1>Email <span>Blaster</span></h1>
+  <div class="header-sub">Bulk Mail Automation</div>
+</header>
+
+<main>
+
+  <!-- Steps bar -->
+  <div class="steps-bar" id="stepsBar">
+    <div class="step-item active" data-step="1"><div class="step-num">1</div> Select Account</div>
+    <div class="step-item" data-step="2"><div class="step-num">2</div> Upload CSV</div>
+    <div class="step-item" data-step="3"><div class="step-num">3</div> Set Range</div>
+    <div class="step-item" data-step="4"><div class="step-num">4</div> Send</div>
+  </div>
+
+  <!-- STEP 1: Account -->
+  <div class="card" id="step1">
+    <div class="card-label">01 / Sender Account</div>
+    <label>Choose which email account to send from</label>
+    <div class="select-wrap">
+      <select id="accountSelect">
+        <option value="">— loading accounts —</option>
+      </select>
+    </div>
+    <div id="accInfo" class="hidden mt-12">
+      <div class="acc-badge"><div class="acc-dot"></div><span id="accEmail"></span></div>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-primary" id="step1Next" disabled onclick="goStep(2)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: CSV Upload -->
+  <div class="card hidden" id="step2">
+    <div class="card-label">02 / Upload Recipients CSV</div>
+    <p style="font-size:0.75rem; color:var(--muted); margin-bottom:16px;">
+      Expected columns: <code style="color:var(--accent)">sno, name, phone_number, school, email</code>
+    </p>
+    <div class="dropzone" id="dropzone">
+      <input type="file" id="csvFile" accept=".csv" />
+      <div class="dropzone-icon" id="dzIcon">📂</div>
+      <div class="dropzone-text" id="dzText"><strong>Click to browse</strong> or drag & drop your CSV</div>
+    </div>
+    <div id="csvStats" class="hidden mt-12">
+      <div class="stat-row">
+        <div class="stat-chip green">Total rows <strong id="totalRows">—</strong></div>
+        <div class="stat-chip">File <strong id="fileName">—</strong></div>
+      </div>
+      <div class="table-wrap mt-12" id="previewWrap"></div>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-ghost" onclick="goStep(1)">← Back</button>
+      <button class="btn btn-primary" id="step2Next" disabled onclick="goStep(3)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: Range + Subject -->
+  <div class="card hidden" id="step3">
+    <div class="card-label">03 / Configure Range & Subject</div>
+    <div class="stat-row" id="rangeInfo">
+      <div class="stat-chip purple">CSV range <strong id="snoRange">—</strong></div>
+    </div>
+    <div class="row-3">
+      <div>
+        <label>From SNO</label>
+        <input type="number" id="fromSno" min="1" placeholder="e.g. 1" />
+      </div>
+      <div>
+        <label>To SNO</label>
+        <input type="number" id="toSno" min="1" placeholder="e.g. 50" />
+      </div>
+      <div>
+        <label>Email Subject</label>
+        <input type="text" id="emailSubject" placeholder="Subject line…" />
+      </div>
+    </div>
+    <div id="rangePreviewWrap" class="hidden mt-20">
+      <div class="card-label">Preview — Selected Recipients</div>
+      <div class="stat-row">
+        <div class="stat-chip green">Selected <strong id="selectedCount">—</strong></div>
+      </div>
+      <div class="table-wrap" id="rangeTable"></div>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-ghost" onclick="goStep(2)">← Back</button>
+      <button class="btn btn-primary" id="previewBtn" onclick="previewRange()">Preview Selection</button>
+      <button class="btn btn-primary hidden" id="step3Next" onclick="goStep(4)">Confirm & Proceed →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: Send -->
+  <div class="card hidden" id="step4">
+    <div class="card-label">04 / Send Emails</div>
+    <div class="stat-row" id="sendStats">
+      <div class="stat-chip purple">Account <strong id="sendAccLabel">—</strong></div>
+      <div class="stat-chip green">Recipients <strong id="sendCount">—</strong></div>
+    </div>
+
+    <div class="progress-outer hidden" id="progressWrap">
+      <div class="progress-inner" id="progressBar" style="width:0%"></div>
+    </div>
+
+    <div class="log-terminal" id="logTerminal">
+      <div class="log-line"><span class="log-info log-time">[ ready ]</span><span class="log-info">Awaiting send command…</span></div>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn btn-ghost" id="backBtn" onclick="goStep(3)">← Back</button>
+      <button class="btn btn-success" id="sendBtn" onclick="sendEmails()">
+        ✉ Send All Emails
+      </button>
+      <button class="btn btn-primary hidden" id="sendAnotherBtn" onclick="resetForAnotherAccount()">
+        + Send Another Batch
+      </button>
+    </div>
+  </div>
+
+</main>
+
+<div id="toast"></div>
+
+<script>
+// ── State ─────────────────────────────────────────────────────────────────
+let state = {
+  accounts: [],
+  selectedAccount: null,
+  csvRows: [],
+  selectedRows: [],
+  currentStep: 1,
+};
+
+// ── Init ──────────────────────────────────────────────────────────────────
+(async function init() {
+  try {
+    const res = await fetch('/api/accounts');
+    state.accounts = await res.json();
+    const sel = document.getElementById('accountSelect');
+    sel.innerHTML = '<option value="">— select an account —</option>';
+    state.accounts.forEach(acc => {
+      sel.innerHTML += `<option value="${acc.id}">${acc.label} — ${acc.email}</option>`;
+    });
+    sel.addEventListener('change', onAccountChange);
+  } catch (e) {
+    toast('Could not reach server. Is server.js running?', 'error');
+  }
+})();
+
+// ── Step navigation ───────────────────────────────────────────────────────
+function goStep(n) {
+  document.getElementById(`step${state.currentStep}`).classList.add('hidden');
+  document.getElementById(`step${n}`).classList.remove('hidden');
+
+  document.querySelectorAll('.step-item').forEach(el => {
+    const s = +el.dataset.step;
+    el.classList.remove('active', 'done');
+    if (s === n) el.classList.add('active');
+    else if (s < n) el.classList.add('done');
+  });
+
+  if (n === 4) updateSendSummary();
+  state.currentStep = n;
+}
+
+// ── Step 1 ────────────────────────────────────────────────────────────────
+function onAccountChange() {
+  const id = document.getElementById('accountSelect').value;
+  const acc = state.accounts.find(a => a.id === id);
+  state.selectedAccount = acc || null;
+
+  const info = document.getElementById('accInfo');
+  const next = document.getElementById('step1Next');
+
+  if (acc) {
+    document.getElementById('accEmail').textContent = acc.email;
+    info.classList.remove('hidden');
+    next.disabled = false;
+  } else {
+    info.classList.add('hidden');
+    next.disabled = true;
+  }
+}
+
+// ── Step 2 ────────────────────────────────────────────────────────────────
+const csvInput = document.getElementById('csvFile');
+const dropzone = document.getElementById('dropzone');
+
+dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('dragover'); });
+dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+dropzone.addEventListener('drop', e => {
+  e.preventDefault(); dropzone.classList.remove('dragover');
+  if (e.dataTransfer.files[0]) handleCSV(e.dataTransfer.files[0]);
+});
+csvInput.addEventListener('change', () => { if (csvInput.files[0]) handleCSV(csvInput.files[0]); });
+
+async function handleCSV(file) {
+  const fd = new FormData();
+  fd.append('csv', file);
+  try {
+    const res = await fetch('/api/parse-csv', { method: 'POST', body: fd });
+    if (!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+
+    state.csvRows = data.rows;
+    document.getElementById('totalRows').textContent = data.total;
+    document.getElementById('fileName').textContent = file.name;
+
+    // Update dropzone look
+    dropzone.classList.add('loaded');
+    document.getElementById('dzIcon').textContent = '📊';
+    document.getElementById('dzText').innerHTML = `<strong>${file.name}</strong> loaded — ${data.total} rows`;
+
+    // Build preview table (first 5 rows)
+    renderTable(document.getElementById('previewWrap'), data.headers, data.rows.slice(0, 5), 'Preview (first 5 rows)');
+    document.getElementById('csvStats').classList.remove('hidden');
+    document.getElementById('step2Next').disabled = false;
+
+    // Pre-fill range
+    const snos = data.rows.map(r => +r.sno).filter(Boolean);
+    document.getElementById('fromSno').value = Math.min(...snos);
+    document.getElementById('toSno').value = Math.max(...snos);
+    document.getElementById('snoRange').textContent = `${Math.min(...snos)} – ${Math.max(...snos)}`;
+
+    toast(`Loaded ${data.total} rows from ${file.name}`, 'success');
+  } catch (e) {
+    toast('CSV parse error: ' + e.message, 'error');
+  }
+}
+
+// ── Step 3 ────────────────────────────────────────────────────────────────
+function previewRange() {
+  const from = +document.getElementById('fromSno').value;
+  const to   = +document.getElementById('toSno').value;
+
+  if (!from || !to || from > to) {
+    toast('Invalid SNO range', 'error'); return;
+  }
+
+  state.selectedRows = state.csvRows.filter(r => +r.sno >= from && +r.sno <= to);
+
+  if (state.selectedRows.length === 0) {
+    toast('No rows matched that range', 'error'); return;
+  }
+
+  document.getElementById('selectedCount').textContent = state.selectedRows.length;
+  const headers = Object.keys(state.csvRows[0]);
+  renderTable(document.getElementById('rangeTable'), headers, state.selectedRows, null);
+  document.getElementById('rangePreviewWrap').classList.remove('hidden');
+  document.getElementById('step3Next').classList.remove('hidden');
+
+  toast(`${state.selectedRows.length} recipients selected`, 'info');
+}
+
+// ── Step 4 ────────────────────────────────────────────────────────────────
+function updateSendSummary() {
+  document.getElementById('sendAccLabel').textContent = state.selectedAccount.label;
+  document.getElementById('sendCount').textContent = state.selectedRows.length;
+}
+
+async function sendEmails() {
+  const sendBtn = document.getElementById('sendBtn');
+  const backBtn = document.getElementById('backBtn');
+  const subject = document.getElementById('emailSubject').value || 'Hello';
+
+  sendBtn.disabled = true;
+  backBtn.disabled = true;
+  sendBtn.innerHTML = '<span class="spinner"></span> Sending…';
+
+  document.getElementById('progressWrap').classList.remove('hidden');
+
+  const log = document.getElementById('logTerminal');
+  log.innerHTML = '';
+
+  function logLine(type, msg) {
+    const time = new Date().toLocaleTimeString('en-GB', { hour12: false });
+    log.innerHTML += `<div class="log-line"><span class="log-time log-${type}">[${time}]</span><span class="log-${type}">${msg}</span></div>`;
+    log.scrollTop = log.scrollHeight;
+  }
+
+  logLine('info', `Starting batch: ${state.selectedRows.length} recipients via ${state.selectedAccount.label}`);
+
+  try {
+    const res = await fetch('/api/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        accountId: state.selectedAccount.id,
+        rows: state.selectedRows,
+        subject,
+      }),
+    });
+
+    const results = await res.json();
+    if (!res.ok) throw new Error(results.error || 'Server error');
+
+    const total = results.sent.length + results.failed.length;
+
+    results.sent.forEach((r, i) => {
+      document.getElementById('progressBar').style.width = `${Math.round(((i + 1) / total) * 100)}%`;
+      logLine('ok', `✓ SNO ${r.sno} → ${r.email}`);
+    });
+
+    results.failed.forEach(r => {
+      logLine('fail', `✗ SNO ${r.sno} → ${r.email} | ${r.reason}`);
+    });
+
+    logLine('info', `Done. ${results.sent.length} sent, ${results.failed.length} failed.`);
+    document.getElementById('progressBar').style.width = '100%';
+
+    sendBtn.classList.add('hidden');
+    document.getElementById('sendAnotherBtn').classList.remove('hidden');
+    toast(`${results.sent.length} emails sent!`, 'success');
+
+  } catch (e) {
+    logLine('fail', 'Error: ' + e.message);
+    sendBtn.disabled = false;
+    backBtn.disabled = false;
+    sendBtn.innerHTML = '✉ Retry Send';
+    toast('Send failed: ' + e.message, 'error');
+  }
+}
+
+// ── Reset for another account ─────────────────────────────────────────────
+function resetForAnotherAccount() {
+  // Only reset account selection; keep CSV loaded
+  document.getElementById('accountSelect').value = '';
+  document.getElementById('accInfo').classList.add('hidden');
+  document.getElementById('step1Next').disabled = true;
+  state.selectedAccount = null;
+
+  // Reset send UI
+  document.getElementById('sendBtn').classList.remove('hidden');
+  document.getElementById('sendBtn').disabled = false;
+  document.getElementById('sendBtn').innerHTML = '✉ Send All Emails';
+  document.getElementById('sendAnotherBtn').classList.add('hidden');
+  document.getElementById('backBtn').disabled = false;
+  document.getElementById('progressBar').style.width = '0%';
+  document.getElementById('progressWrap').classList.add('hidden');
+
+  goStep(1);
+  toast('Pick a different account and reuse the same CSV or select a new range.', 'info');
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────
+function renderTable(container, headers, rows) {
+  let html = '<table><thead><tr>';
+  headers.forEach(h => html += `<th>${h}</th>`);
+  html += '</tr></thead><tbody>';
+  rows.forEach(row => {
+    html += '<tr>';
+    headers.forEach(h => html += `<td>${row[h] ?? ''}</td>`);
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+let toastTimer;
+function toast(msg, type = 'info') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `show ${type}`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3500);
+}
+</script>
+</body>
+</html>
