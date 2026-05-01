@@ -70,8 +70,18 @@ app.post("/api/parse-csv", upload.single("csv"), (req, res) => {
 });
 
 // ── Send emails (chunked) ─────────────────────────────────────────────────
+const ACTIVE_JOBS = {};
+
+app.post("/api/abort", (req, res) => {
+  const { jobId } = req.body;
+  if (jobId && ACTIVE_JOBS[jobId]) {
+    ACTIVE_JOBS[jobId].aborted = true;
+  }
+  res.json({ ok: true });
+});
+
 app.post("/api/send", async (req, res) => {
-  const { accountId, rows, subject } = req.body;
+  const { accountId, rows, subject, jobId } = req.body;
   if (!ACCOUNTS[accountId]) return res.status(400).json({ error: "Unknown account" });
 
   const acc = ACCOUNTS[accountId];
@@ -94,13 +104,17 @@ app.post("/api/send", async (req, res) => {
   // Set headers for chunked streaming
   res.setHeader('Content-Type', 'application/x-ndjson; charset=utf-8');
   res.setHeader('Transfer-Encoding', 'chunked');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no'); // Crucial for Render/Nginx to not buffer chunks
 
-  let isAborted = false;
-  req.on('close', () => { isAborted = true; });
+  if (jobId) {
+    ACTIVE_JOBS[jobId] = { aborted: false };
+  }
 
   for (let i = 0; i < rows.length; i++) {
-    if (isAborted) {
-      console.log(`[INFO] Request aborted by client. Stopping at SNO ${rows[i].sno}`);
+    if (jobId && ACTIVE_JOBS[jobId].aborted) {
+      console.log(`[INFO] Job ${jobId} aborted by client. Stopping at SNO ${rows[i].sno}`);
       break;
     }
     

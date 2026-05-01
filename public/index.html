@@ -560,6 +560,7 @@ function updateSendSummary() {
 }
 
 let currentAbortController = null;
+let currentJobId = null;
 
 async function sendEmails() {
   const sendBtn = document.getElementById('sendBtn');
@@ -567,6 +568,7 @@ async function sendEmails() {
   const subject = document.getElementById('emailSubject').value || 'Hello';
 
   currentAbortController = new AbortController();
+  currentJobId = Math.random().toString(36).substring(2);
 
   sendBtn.innerHTML = '<span class="spinner"></span> Terminate';
   sendBtn.classList.remove('btn-success');
@@ -575,6 +577,13 @@ async function sendEmails() {
   sendBtn.onclick = () => {
     if (currentAbortController) {
       currentAbortController.abort();
+      if (currentJobId) {
+        fetch('/api/abort', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ jobId: currentJobId })
+        }).catch(() => {});
+      }
       sendBtn.innerHTML = 'Terminating...';
       sendBtn.disabled = true;
     }
@@ -603,6 +612,7 @@ async function sendEmails() {
         accountId: state.selectedAccount.id,
         rows: state.selectedRows,
         subject,
+        jobId: currentJobId,
       }),
       signal: currentAbortController.signal,
     });
