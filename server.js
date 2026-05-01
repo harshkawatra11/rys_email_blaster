@@ -86,38 +86,31 @@ app.post("/api/send", async (req, res) => {
 
   const template   = fs.readFileSync(templatePath, "utf-8");
   const gmail      = makeGmailClient(acc);
-  const CHUNK_SIZE = 10;   // emails per batch
-  const CHUNK_WAIT = 1000; // ms between batches — tune up if you hit rate limits
-  const results    = { sent: [], failed: [] };
+  const EMAIL_DELAY = 2000; // ms between each email
+  const results     = { sent: [], failed: [] };
 
-  for (let i = 0; i < rows.length; i += CHUNK_SIZE) {
-    const chunk = rows.slice(i, i + CHUNK_SIZE);
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
 
-    const settled = await Promise.allSettled(
-      chunk.map((row) => {
-        let body = template;
-        Object.entries(row).forEach(([k, v]) => { body = body.replaceAll(`{{${k}}}`, v); });
+    let body = template;
+    Object.entries(row).forEach(([k, v]) => { body = body.replaceAll(`{{${k}}}`, v); });
 
-        const raw = buildRawMessage({
-          from:    `"${acc.name}" <${acc.email}>`,
-          to:      row.email,
-          subject: subject || `Hello from ${acc.name}`,
-          body,
-        });
-
-        return gmail.users.messages.send({ userId: "me", requestBody: { raw } })
-          .then(() => ({ ok: true,  sno: row.sno, email: row.email }))
-          .catch((err) => ({ ok: false, sno: row.sno, email: row.email, reason: err.message }));
-      })
-    );
-
-    settled.forEach(({ value }) => {
-      if (value.ok) results.sent.push({ sno: value.sno, email: value.email });
-      else          results.failed.push({ sno: value.sno, email: value.email, reason: value.reason });
+    const raw = buildRawMessage({
+      from:    `"${acc.name}" <${acc.email}>`,
+      to:      row.email,
+      subject: subject || `Hello from ${acc.name}`,
+      body,
     });
 
-    // Wait between chunks — skip delay after the last one
-    if (i + CHUNK_SIZE < rows.length) await delay(CHUNK_WAIT);
+    try {
+      await gmail.users.messages.send({ userId: "me", requestBody: { raw } });
+      results.sent.push({ sno: row.sno, email: row.email });
+    } catch (err) {
+      results.failed.push({ sno: row.sno, email: row.email, reason: err.message });
+    }
+
+    // Wait 2 seconds after each email — skip delay after the last one
+    if (i < rows.length - 1) await delay(EMAIL_DELAY);
   }
 
   res.json(results);
