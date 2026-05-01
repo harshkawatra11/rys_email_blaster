@@ -87,7 +87,13 @@ app.post("/api/send", async (req, res) => {
   const template   = fs.readFileSync(templatePath, "utf-8");
   const gmail      = makeGmailClient(acc);
   const EMAIL_DELAY = 2000; // ms between each email
-  const results     = { sent: [], failed: [] };
+
+  // Define delay function since it was missing
+  const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+  // Set headers for chunked streaming
+  res.setHeader('Content-Type', 'application/x-ndjson; charset=utf-8');
+  res.setHeader('Transfer-Encoding', 'chunked');
 
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
@@ -104,16 +110,16 @@ app.post("/api/send", async (req, res) => {
 
     try {
       await gmail.users.messages.send({ userId: "me", requestBody: { raw } });
-      results.sent.push({ sno: row.sno, email: row.email });
+      res.write(JSON.stringify({ ok: true, sno: row.sno, email: row.email }) + "\n");
     } catch (err) {
-      results.failed.push({ sno: row.sno, email: row.email, reason: err.message });
+      res.write(JSON.stringify({ ok: false, sno: row.sno, email: row.email, reason: err.message }) + "\n");
     }
 
     // Wait 2 seconds after each email — skip delay after the last one
     if (i < rows.length - 1) await delay(EMAIL_DELAY);
   }
 
-  res.json(results);
+  res.end();
 });
 
 // ── Start ──────────────────────────────────────────────────────────────────

@@ -592,26 +592,52 @@ async function sendEmails() {
       }),
     });
 
-    const results = await res.json();
-    if (!res.ok) throw new Error(results.error || 'Server error');
+    if (!res.ok) {
+      const errText = await res.text();
+      let errMsg = 'Server error';
+      try { errMsg = JSON.parse(errText).error || errMsg; } catch(e){}
+      throw new Error(errMsg);
+    }
 
-    const total = results.sent.length + results.failed.length;
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder("utf-8");
+    let buffer = "";
+    let sentCount = 0;
+    let failCount = 0;
+    const total = state.selectedRows.length;
 
-    results.sent.forEach((r, i) => {
-      document.getElementById('progressBar').style.width = `${Math.round(((i + 1) / total) * 100)}%`;
-      logLine('ok', `✓ SNO ${r.sno} → ${r.email}`);
-    });
+    while (true) {
+      const { value, done } = await reader.read();
+      if (value) {
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop(); // keep incomplete line
+        
+        for (const line of lines) {
+          if (!line.trim()) continue;
+          let r;
+          try { r = JSON.parse(line); } catch(e) { continue; }
+          
+          if (r.ok) {
+            sentCount++;
+            logLine('ok', `✓ SNO ${r.sno} → ${r.email}`);
+          } else {
+            failCount++;
+            logLine('fail', `✗ SNO ${r.sno} → ${r.email} | ${r.reason}`);
+          }
+          const totalProcessed = sentCount + failCount;
+          document.getElementById('progressBar').style.width = `${Math.round((totalProcessed / total) * 100)}%`;
+        }
+      }
+      if (done) break;
+    }
 
-    results.failed.forEach(r => {
-      logLine('fail', `✗ SNO ${r.sno} → ${r.email} | ${r.reason}`);
-    });
-
-    logLine('info', `Done. ${results.sent.length} sent, ${results.failed.length} failed.`);
+    logLine('info', `Done. ${sentCount} sent, ${failCount} failed.`);
     document.getElementById('progressBar').style.width = '100%';
 
     sendBtn.classList.add('hidden');
     document.getElementById('sendAnotherBtn').classList.remove('hidden');
-    toast(`${results.sent.length} emails sent!`, 'success');
+    toast(`${sentCount} emails sent!`, 'success');
 
   } catch (e) {
     logLine('fail', 'Error: ' + e.message);
