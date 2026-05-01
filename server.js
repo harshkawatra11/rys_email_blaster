@@ -95,7 +95,15 @@ app.post("/api/send", async (req, res) => {
   res.setHeader('Content-Type', 'application/x-ndjson; charset=utf-8');
   res.setHeader('Transfer-Encoding', 'chunked');
 
+  let isAborted = false;
+  req.on('close', () => { isAborted = true; });
+
   for (let i = 0; i < rows.length; i++) {
+    if (isAborted) {
+      console.log(`[INFO] Request aborted by client. Stopping at SNO ${rows[i].sno}`);
+      break;
+    }
+    
     const row = rows[i];
 
     let body = template;

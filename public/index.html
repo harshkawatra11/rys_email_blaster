@@ -559,14 +559,28 @@ function updateSendSummary() {
   document.getElementById('sendCount').textContent = state.selectedRows.length;
 }
 
+let currentAbortController = null;
+
 async function sendEmails() {
   const sendBtn = document.getElementById('sendBtn');
   const backBtn = document.getElementById('backBtn');
   const subject = document.getElementById('emailSubject').value || 'Hello';
 
-  sendBtn.disabled = true;
+  currentAbortController = new AbortController();
+
+  sendBtn.innerHTML = '<span class="spinner"></span> Terminate';
+  sendBtn.classList.remove('btn-success');
+  sendBtn.classList.add('btn-danger');
+  sendBtn.disabled = false;
+  sendBtn.onclick = () => {
+    if (currentAbortController) {
+      currentAbortController.abort();
+      sendBtn.innerHTML = 'Terminating...';
+      sendBtn.disabled = true;
+    }
+  };
+
   backBtn.disabled = true;
-  sendBtn.innerHTML = '<span class="spinner"></span> Sending…';
 
   document.getElementById('progressWrap').classList.remove('hidden');
 
@@ -590,6 +604,7 @@ async function sendEmails() {
         rows: state.selectedRows,
         subject,
       }),
+      signal: currentAbortController.signal,
     });
 
     if (!res.ok) {
@@ -636,15 +651,29 @@ async function sendEmails() {
     document.getElementById('progressBar').style.width = '100%';
 
     sendBtn.classList.add('hidden');
+    sendBtn.classList.remove('btn-danger');
+    sendBtn.classList.add('btn-success');
+    sendBtn.onclick = sendEmails;
     document.getElementById('sendAnotherBtn').classList.remove('hidden');
     toast(`${sentCount} emails sent!`, 'success');
 
   } catch (e) {
-    logLine('fail', 'Error: ' + e.message);
+    if (e.name === 'AbortError') {
+      logLine('warn', 'Sending terminated by user.');
+      toast('Sending terminated.', 'info');
+    } else {
+      logLine('fail', 'Error: ' + e.message);
+      toast('Send failed: ' + e.message, 'error');
+    }
+    
+    sendBtn.classList.remove('btn-danger');
+    sendBtn.classList.add('btn-success');
+    sendBtn.innerHTML = '✉ Retry Send';
+    sendBtn.onclick = sendEmails;
     sendBtn.disabled = false;
     backBtn.disabled = false;
-    sendBtn.innerHTML = '✉ Retry Send';
-    toast('Send failed: ' + e.message, 'error');
+  } finally {
+    currentAbortController = null;
   }
 }
 
@@ -657,9 +686,12 @@ function resetForAnotherAccount() {
   state.selectedAccount = null;
 
   // Reset send UI
-  document.getElementById('sendBtn').classList.remove('hidden');
-  document.getElementById('sendBtn').disabled = false;
-  document.getElementById('sendBtn').innerHTML = '✉ Send All Emails';
+  const sendBtn = document.getElementById('sendBtn');
+  sendBtn.classList.remove('hidden', 'btn-danger');
+  sendBtn.classList.add('btn-success');
+  sendBtn.disabled = false;
+  sendBtn.innerHTML = '✉ Send All Emails';
+  sendBtn.onclick = sendEmails;
   document.getElementById('sendAnotherBtn').classList.add('hidden');
   document.getElementById('backBtn').disabled = false;
   document.getElementById('progressBar').style.width = '0%';
