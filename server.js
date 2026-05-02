@@ -13,17 +13,41 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // ── Account registry ──────────────────────────────────────────────────────
 const ACCOUNTS = {
-  harsh111: {
-    label:        "harsh111",
-    email:        (process.env.HARSH111_EMAIL || "").trim(),
-    refreshToken: (process.env.HARSH111_REFRESH_TOKEN || "").trim(),
-    name:         (process.env.HARSH111_NAME || "harsh111").trim(),
+  tanisha: {
+    label:        "Tanisha",
+    email:        (process.env.TANISHA_EMAIL || "").trim(),
+    refreshToken: (process.env.TANISHA_REFRESH_TOKEN || "").trim(),
+    name:         (process.env.TANISHA_NAME || "Tanisha").trim(),
   },
-  harshgdrive: {
-    label:        "harshgdrive",
-    email:        (process.env.HARSHGDRIVE_EMAIL || "").trim(),
-    refreshToken: (process.env.HARSHGDRIVE_REFRESH_TOKEN || "").trim(),
-    name:         (process.env.HARSHGDRIVE_NAME || "harshgdrive").trim(),
+  avni: {
+    label:        "Avni",
+    email:        (process.env.AVNI_EMAIL || "").trim(),
+    refreshToken: (process.env.AVNI_REFRESH_TOKEN || "").trim(),
+    name:         (process.env.AVNI_NAME || "Avni").trim(),
+  },
+  parv: {
+    label:        "Parv",
+    email:        (process.env.PARV_EMAIL || "").trim(),
+    refreshToken: (process.env.PARV_REFRESH_TOKEN || "").trim(),
+    name:         (process.env.PARV_NAME || "Parv").trim(),
+  },
+  shreya: {
+    label:        "Shreya",
+    email:        (process.env.SHREYA_EMAIL || "").trim(),
+    refreshToken: (process.env.SHREYA_REFRESH_TOKEN || "").trim(),
+    name:         (process.env.SHREYA_NAME || "Shreya").trim(),
+  },
+  jatink: {
+    label:        "Jatink",
+    email:        (process.env.JATINK_EMAIL || "").trim(),
+    refreshToken: (process.env.JATINK_REFRESH_TOKEN || "").trim(),
+    name:         (process.env.JATINK_NAME || "Jatink").trim(),
+  },
+  rajdhaniyuvasansad: {
+    label:        "RajdhaniYuvaSansad",
+    email:        (process.env.RAJDHANIYUVASANSAD_EMAIL || "").trim(),
+    refreshToken: (process.env.RAJDHANIYUVASANSAD_REFRESH_TOKEN || "").trim(),
+    name:         (process.env.RAJDHANIYUVASANSAD_NAME || "RajdhaniYuvaSansad").trim(),
   },
 };
 
@@ -148,6 +172,10 @@ app.post("/api/send", async (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`\n✉  Email Blaster → http://localhost:${PORT}`);
-  console.log(`   harsh111    → ${ACCOUNTS.harsh111.email    || "⚠ NOT SET"}`);
-  console.log(`   harshgdrive → ${ACCOUNTS.harshgdrive.email || "⚠ NOT SET"}\n`);
+  console.log(`   Tanisha            → ${ACCOUNTS.tanisha.email            || "⚠ NOT SET"}`);
+  console.log(`   Avni               → ${ACCOUNTS.avni.email               || "⚠ NOT SET"}`);
+  console.log(`   Parv               → ${ACCOUNTS.parv.email               || "⚠ NOT SET"}`);
+  console.log(`   Shreya             → ${ACCOUNTS.shreya.email             || "⚠ NOT SET"}`);
+  console.log(`   Jatink             → ${ACCOUNTS.jatink.email             || "⚠ NOT SET"}`);
+  console.log(`   RajdhaniYuvaSansad → ${ACCOUNTS.rajdhaniyuvasansad.email || "⚠ NOT SET"}\n`);
 });
