@@ -60,7 +60,7 @@ function makeGmailClient(acc) {
   return google.gmail({ version: "v1", auth: oauth2 });
 }
 
-function buildRawMessage({ from, to, subject, body }) {
+/*function buildRawMessage({ from, to, subject, body }) {
   const msg = [
     `From: ${from}`,
     `To: ${to}`,
@@ -71,6 +71,46 @@ function buildRawMessage({ from, to, subject, body }) {
     body,
   ].join("\r\n");
   return Buffer.from(msg).toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}*/
+
+function buildRawMessage({ from, to, subject, body, attachmentLink }) {
+  // Convert plain text body to HTML (preserve line breaks)
+  const htmlBody = body
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\n/g, "<br>");
+
+  // Append a clickable button if attachment link exists
+  const attachmentHtml = attachmentLink
+    ? `<br><br>
+       <a href="${attachmentLink}" 
+          style="background:#4F46E5;color:#fff;padding:10px 20px;
+                 text-decoration:none;border-radius:6px;font-family:sans-serif;">
+         📎 View Attachment
+       </a>`
+    : "";
+
+  const html = `
+    <div style="font-family:sans-serif;font-size:14px;color:#222;">
+      ${htmlBody}
+      ${attachmentHtml}
+    </div>`;
+
+  const msg = [
+    `From: ${from}`,
+    `To: ${to}`,
+    `Subject: ${subject}`,
+    `MIME-Version: 1.0`,
+    `Content-Type: text/html; charset=UTF-8`,
+    ``,
+    html,
+  ].join("\r\n");
+
+  return Buffer.from(msg).toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
 }
 
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -147,12 +187,20 @@ app.post("/api/send", async (req, res) => {
     let body = template;
     Object.entries(row).forEach(([k, v]) => { body = body.replaceAll(`{{${k}}}`, v); });
 
-    const raw = buildRawMessage({
+    /*const raw = buildRawMessage({
       from:    `"${acc.name}" <${acc.email}>`,
       to:      row.email,
       subject: subject || `Hello from ${acc.name}`,
       body,
-    });
+    });*/
+
+    const raw = buildRawMessage({
+  from:           `"${acc.name}" <${acc.email}>`,
+  to:             row.email,
+  subject:        subject || `Hello from ${acc.name}`,
+  body,
+  attachmentLink: row.attachment_link || "",  // ← add this
+});
 
     try {
       await gmail.users.messages.send({ userId: "me", requestBody: { raw } });
