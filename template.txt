@@ -4,7 +4,7 @@ We hope this message finds you well.
 
 We are pleased to reach out to you regarding your registration with {{school}}.
 
-Please feel free to contact us if you have any questions.
+Please feel free to contact us if you have any questions.{{Attachment}}
 
 Warm regards,
 The Team rys
