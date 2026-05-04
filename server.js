@@ -31,6 +31,12 @@ const ACCOUNTS = {
     refreshToken: (process.env.PARV_REFRESH_TOKEN || "").trim(),
     name:         (process.env.PARV_NAME || "Parv").trim(),
   },
+  parvv: {
+    label:        "Parvv",
+    email:        (process.env.PARVV_EMAIL || "").trim(),
+    refreshToken: (process.env.PARVV_REFRESH_TOKEN || "").trim(),
+    name:         (process.env.PARVV_NAME || "Parvv").trim(),
+  },
   shreya: {
     label:        "Shreya",
     email:        (process.env.SHREYA_EMAIL || "").trim(),
@@ -43,11 +49,29 @@ const ACCOUNTS = {
     refreshToken: (process.env.JATINK_REFRESH_TOKEN || "").trim(),
     name:         (process.env.JATINK_NAME || "Jatink").trim(),
   },
+  jatin: {
+    label:        "Jatin",
+    email:        (process.env.JATIN_EMAIL || "").trim(),
+    refreshToken: (process.env.JATIN_REFRESH_TOKEN || "").trim(),
+    name:         (process.env.JATIN_NAME || "Jatin").trim(),
+  },
   rajdhaniyuvasansad: {
     label:        "RajdhaniYuvaSansad",
     email:        (process.env.RAJDHANIYUVASANSAD_EMAIL || "").trim(),
     refreshToken: (process.env.RAJDHANIYUVASANSAD_REFRESH_TOKEN || "").trim(),
     name:         (process.env.RAJDHANIYUVASANSAD_NAME || "RajdhaniYuvaSansad").trim(),
+  },
+  kartik: {
+    label:        "Kartik",
+    email:        (process.env.KARTIK_EMAIL || "").trim(),
+    refreshToken: (process.env.KARTIK_REFRESH_TOKEN || "").trim(),
+    name:         (process.env.KARTIK_NAME || "Kartik").trim(),
+  },
+  zigyasa: {
+    label:        "Zigyasa",
+    email:        (process.env.ZIGYASA_EMAIL || "").trim(),
+    refreshToken: (process.env.ZIGYASA_REFRESH_TOKEN || "").trim(),
+    name:         (process.env.ZIGYASA_NAME || "Zigyasa").trim(),
   },
 };
 
@@ -223,7 +247,11 @@ app.listen(PORT, () => {
   console.log(`   Tanisha            → ${ACCOUNTS.tanisha.email            || "⚠ NOT SET"}`);
   console.log(`   Avni               → ${ACCOUNTS.avni.email               || "⚠ NOT SET"}`);
   console.log(`   Parv               → ${ACCOUNTS.parv.email               || "⚠ NOT SET"}`);
+  console.log(`   Parvv              → ${ACCOUNTS.parvv.email              || "⚠ NOT SET"}`);
   console.log(`   Shreya             → ${ACCOUNTS.shreya.email             || "⚠ NOT SET"}`);
   console.log(`   Jatink             → ${ACCOUNTS.jatink.email             || "⚠ NOT SET"}`);
-  console.log(`   RajdhaniYuvaSansad → ${ACCOUNTS.rajdhaniyuvasansad.email || "⚠ NOT SET"}\n`);
+  console.log(`   Jatin              → ${ACCOUNTS.jatin.email              || "⚠ NOT SET"}`);
+  console.log(`   RajdhaniYuvaSansad → ${ACCOUNTS.rajdhaniyuvasansad.email || "⚠ NOT SET"}`);
+  console.log(`   Kartik             → ${ACCOUNTS.kartik.email             || "⚠ NOT SET"}`);
+  console.log(`   Zigyasa            → ${ACCOUNTS.zigyasa.email            || "⚠ NOT SET"}\n`);
 });
