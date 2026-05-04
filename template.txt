@@ -1,11 +1,22 @@
 Dear {{name}},
 
-We hope this message finds you well.
+I hope this message finds you well.
 
-We are pleased to reach out to you regarding your registration with {{school}}.
+I represent Rajdhani Yuva Sansad — a Delhi-based youth organisation that conducts Model United Nations (MUN) and Youth Parliament (YP) events at schools across the country.
 
-Please feel free to contact us if you have any questions.
+We've seen firsthand how these programmes transform students — they learn to research real-world issues, debate constructively, build confidence, and think like future leaders. Many of our past participants have gone on to represent India at national-level competitions.
+
+I'd love to explore hosting a session at {{school}}. These events:
+✦ Require zero cost or effort from your school
+✦ Are fully managed by our experienced team
+✦ Come with a post-event report and certificates for all participants
+✦ Give your students a genuine edge in co-curricular achievement
+
+Would you be open to a 15-minute call this week to discuss how this could work for your students?
+
+Along with this email, Please find attached a one pager on who we are and what we are:
 {{attachment_link}}
 
 Warm regards,
-The Team rys
+Team Rajdhani Yuva Sansad
+8860159821 | rajdhaniyuvasansad2017@gmail.com |www.rajdhaniyuvasansad.com
