@@ -1,59 +1,68 @@
-To,
-{{name}}
+Respected {{name}},
+{{school}},
 
-We are proud to present the Junior United Nations & Yuva Sajhedari 3.0, hosted by Silverline Prestige School, Nehru Nagar, Ghaziabad, in association with Rajdhani Yuva Sansad!
- 
-This premier youth conference offers an exceptional platform for students from Grades 3 to 8 to step into the shoes of leaders, lawmakers, and change-makers. Participants will engage in powerful debates and impactful policy-making, discussing issues that define the heart and soul of Bharat.
- 
-The event consists of two distinct conferences based on grade levels :
- 
-1. Junior United Nations (JUN)
- 
-Eligibility: Classes 3, 4, & 5
-Date: August 21st, 2026
-Registration Fee: ₹2000/- (Rupees Two Thousand Only)
- 
-2. Yuva Sajhedari 3.0
-Eligibility: Classes 6, 7, & 8
-Date: August 21st & 22nd, 2026
- 
-Registration Fee: ₹2000/- (Rupees Two Thousand Only)
-Venue: Silverline Prestige School, Nehru Nagar, Ghaziabad
- 
-Please find attached the comprehensive brochure covering the details for both the Junior United Nations and Yuva Sajhedari 3.0 for your reference:
+Warm greetings from Rajdhani Yuva Sansad!
+
+Imagine your students stepping into the chambers of the United Nations, debating trade policy at the WTO, or reporting breaking news as Press members at the International Press — all at the age of 10, 12, or 14.
+
+This August, we are making that possible.
+
+We are thrilled to invite {{school}} to be a part of Junior United Nations & Yuva Sajhedari 3.0 — a premier youth leadership conference hosted at Silverline Prestige School, Nehru Nagar, Ghaziabad on 21st & 22nd August 2026.
+
+━━━━━━━━━━━━━━━━━━━━━━
+TWO CONFERENCES. ONE INCREDIBLE WEEKEND.
+━━━━━━━━━━━━━━━━━━━━━━
+
+🎓 JUNIOR UNITED NATIONS | Classes 3–5 | 21st August
+Fee: ₹2,000 per student
+
+Committees:
+* Class 3: The United Nations — Peace, Kindness & Friendship in the World
+* Classes 4 & 5: Lok Sabha — Promoting Sports & Physical Fitness Nationwide
+* Classes 4 & 5: Creative Press — Photojournalists, Memers, Journalists, Vloggers & Cartoonists
+
+🏛️ YUVA SAJHEDARI 3.0 | Classes 6–8 | 21st & 22nd August
+Fee: ₹2,000 per student
+
+Committees:
+* WTO: The Strait of Hormuz — Global Trade & International Security
+* CBFC: Artistic Freedom in India — Freedom of Expression
+* International Press: Photojournalists, Memers, Journalists, Vloggers & Cartonists
+
+📍 Venue: Silverline Prestige School, Nehru Nagar, Ghaziabad
+
+━━━━━━━━━━━━━━━━━━━━━━
+WHY SCHOOLS LOVE SENDING THEIR STUDENTS TO RYS
+━━━━━━━━━━━━━━━━━━━━━━
+
+Rajdhani Yuva Sansad has hosted distinguished guests including Hon'ble Union Ministers, Legislative Assembly Speakers, Members of Parliament, and senior members of the judiciary. Our events have been recognised as a meaningful platform for young students to discover their voice, build confidence, and develop critical thinking.
+
+Your students will return with:
+✨ Participation certificates valued by colleges and universities
+✨ Real skills in research, public speaking, and listening
+✨ Lifelong memories of debating on a national stage
+
+━━━━━━━━━━━━━━━━━━━━━━
+REGISTER NOW
+━━━━━━━━━━━━━━━━━━━━━━
+
+📝 Registration Form: https://forms.gle/esaySKJLtMzmcohd8
+📋 View All Committees & Portfolios: https://docs.google.com/spreadsheets/d/1iHfu9gKiky_gOEu5eQbXOfw6aXtfE4PEiAIk1OjOC-g/edit?usp=sharing
+
+The detailed event brochure is attached. Seats are limited and allotments are made on a first-come, first-served basis — we encourage early registration:
 {{attachment_link}}
- 
-Committees and Agendas : 
- 
-Grade 3:
- 
-- The United Nations: Need for peace, kindness, and friendship in the world.
- 
-Grades 4 & 5:
- 
-- Lok Sabha: Discussion on ways to promote sports and physical fitness nationwide.
- 
-- Creative Press: Portfolios for Photojournalists, Memers, Caricaturists, Journalists, and Vloggers.
- 
-Grades 6–8:
- 
-- World Trade Organisation: Deliberation on the Strait of Hormuz and its implications for Global Trade and International Security.
- 
-- Central Board of Film Certification: Deliberation on Artistic Freedom in India: Promoting and Protecting Freedom of Expression.
- 
-- International Press: Portfolios for Photojournalists, Memers, Caricaturists, Journalists, and Vloggers.
- 
-Don't miss this opportunity for your students to let their voices echo on a prestigious stage. We are attaching the official Google Form link below for the registration process:
- 
-Registration Link: https://forms.gle/esaySKJLtMzmcohd8
- 
-You may also access the Portfolio Matrix via the link below to view available portfolios :
 
-https://docs.google.com/spreadsheets/d/1iHfu9gKiky_gOEu5eQbXOfw6aXtfE4PEiAIk1OjOC-g/edit?usp=sharing
- 
-We look forward to welcoming your students to this journey of leadership and discovery.
- 
-Warm regards,
-Team Rajdhani Yuva Sansad
-Ms. Avni-8744083366 | rajdhaniyuvasansad2017@gmail.com |www.rajdhaniyuvasansad.com
+For any queries, please write to us at rajdhaniyuvasansad2017@gmail.com — we'd love to connect.
 
+Looking forward to seeing {{school}} shine on the Yuva Sajhedari stage!
+
+With warm regards,
+
+Ms. Avni Chauhan (8744083366)
+Chief, Yuva Sajhedari 3.0
+Rajdhani Yuva Sansad
+rajdhaniyuvasansad2017@gmail.com
+
+On behalf of
+Adv. Jai Saini & Adv. Isha Kapoor
+Co-Founders, Rajdhani Yuva Sansad | www.rajdhaniyuvasansad.com | https://www.instagram.com/rajdhaaniyuvaasansad/
