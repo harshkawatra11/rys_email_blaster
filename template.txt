@@ -1,22 +1,59 @@
-Dear {{name}},
+To,
+{{name}}
 
-I hope this message finds you well.
-
-I represent Rajdhani Yuva Sansad — a Delhi-based youth organisation that conducts Model United Nations (MUN) and Youth Parliament (YP) events at schools across the country.
-
-We've seen firsthand how these programmes transform students — they learn to research real-world issues, debate constructively, build confidence, and think like future leaders. Many of our past participants have gone on to represent India at national-level competitions.
-
-I'd love to explore hosting a session at {{school}}. These events:
-✦ Require zero cost or effort from your school
-✦ Are fully managed by our experienced team
-✦ Come with a post-event report and certificates for all participants
-✦ Give your students a genuine edge in co-curricular achievement
-
-Would you be open to a 15-minute call this week to discuss how this could work for your students?
-
-Along with this email, Please find attached a one pager on who we are and what we are:
+We are proud to present the Junior United Nations & Yuva Sajhedari 3.0, hosted by Silverline Prestige School, Nehru Nagar, Ghaziabad, in association with Rajdhani Yuva Sansad!
+ 
+This premier youth conference offers an exceptional platform for students from Grades 3 to 8 to step into the shoes of leaders, lawmakers, and change-makers. Participants will engage in powerful debates and impactful policy-making, discussing issues that define the heart and soul of Bharat.
+ 
+The event consists of two distinct conferences based on grade levels :
+ 
+1. Junior United Nations (JUN)
+ 
+Eligibility: Classes 3, 4, & 5
+Date: August 21st, 2026
+Registration Fee: ₹2000/- (Rupees Two Thousand Only)
+ 
+2. Yuva Sajhedari 3.0
+Eligibility: Classes 6, 7, & 8
+Date: August 21st & 22nd, 2026
+ 
+Registration Fee: ₹2000/- (Rupees Two Thousand Only)
+Venue: Silverline Prestige School, Nehru Nagar, Ghaziabad
+ 
+Please find attached the comprehensive brochure covering the details for both the Junior United Nations and Yuva Sajhedari 3.0 for your reference:
 {{attachment_link}}
+ 
+Committees and Agendas : 
+ 
+Grade 3:
+ 
+- The United Nations: Need for peace, kindness, and friendship in the world.
+ 
+Grades 4 & 5:
+ 
+- Lok Sabha: Discussion on ways to promote sports and physical fitness nationwide.
+ 
+- Creative Press: Portfolios for Photojournalists, Memers, Caricaturists, Journalists, and Vloggers.
+ 
+Grades 6–8:
+ 
+- World Trade Organisation: Deliberation on the Strait of Hormuz and its implications for Global Trade and International Security.
+ 
+- Central Board of Film Certification: Deliberation on Artistic Freedom in India: Promoting and Protecting Freedom of Expression.
+ 
+- International Press: Portfolios for Photojournalists, Memers, Caricaturists, Journalists, and Vloggers.
+ 
+Don't miss this opportunity for your students to let their voices echo on a prestigious stage. We are attaching the official Google Form link below for the registration process:
+ 
+Registration Link: https://forms.gle/esaySKJLtMzmcohd8
+ 
+You may also access the Portfolio Matrix via the link below to view available portfolios :
 
+https://docs.google.com/spreadsheets/d/1iHfu9gKiky_gOEu5eQbXOfw6aXtfE4PEiAIk1OjOC-g/edit?usp=sharing
+ 
+We look forward to welcoming your students to this journey of leadership and discovery.
+ 
 Warm regards,
 Team Rajdhani Yuva Sansad
-8860159821 | rajdhaniyuvasansad2017@gmail.com |www.rajdhaniyuvasansad.com
+Ms. Avni-8744083366 | rajdhaniyuvasansad2017@gmail.com |www.rajdhaniyuvasansad.com
+
