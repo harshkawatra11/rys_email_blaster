@@ -1,5 +1,5 @@
 Respected {{name}},
-{{school}},
+{{school}}
 
 Warm greetings from Rajdhani Yuva Sansad!
 
