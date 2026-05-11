@@ -3,63 +3,64 @@ Respected {{name}},
 
 Warm greetings from Rajdhani Yuva Sansad!
 
-Imagine your students stepping into the chambers of the United Nations, debating trade policy at the WTO, or reporting breaking news as Press members at the International Press- all at the age of 10, 12, or 14.
+We are honoured to extend a formal invitation to {{school}} to participate in the third edition of GLOBAL PANCHAYAT- one of the most distinguished youth leadership conferences in the Delhi-NCR region- hosted at JKG International School, Indirapuram on 24th & 25th July 2026 (Friday and Saturday).
 
-This August, we are making that possible.
-
-We are thrilled to invite {{school}} to be a part of Junior United Nations & Yuva Sajhedari 3.0 - a premier youth leadership conference hosted at Silverline Prestige School, Nehru Nagar, Ghaziabad on 21st & 22nd August 2026.
+Over the years, Rajdhani Yuva Sansad has built an exceptional legacy of delivering structured, intellectually rigorous learning experiences for young delegates- with distinguished guests including Hon'ble Union Minister Sh. Arjun Ram Meghwal, Hon'ble Speakers of the Delhi and Haryana Legislative Assemblies, sitting Members of Parliament, senior members of the judiciary, and legal luminaries.
 
 ━━━━━━━━━━━━━━━━━━━━━━
-TWO CONFERENCES. ONE INCREDIBLE WEEKEND.
+ABOUT THE CONFERENCE
 ━━━━━━━━━━━━━━━━━━━━━━
 
-🎓 JUNIOR UNITED NATIONS | Classes 3–5 | 21st August
-Fee: ₹2,000 per student
-
-Committees:
-* Class 3: The United Nations - Peace, Kindness & Friendship in the World
-* Classes 4 & 5: Lok Sabha - Promoting Sports & Physical Fitness Nationwide
-* Classes 4 & 5: Creative Press - Photojournalists, Memers, Journalists, Vloggers & Cartoonists
-
-🏛️ YUVA SAJHEDARI 3.0 | Classes 6–8 | 21st & 22nd August
-Fee: ₹2,000 per student
-
-Committees:
-* WTO: The Strait of Hormuz - Global Trade & International Security
-* CBFC: Artistic Freedom in India - Freedom of Expression
-* International Press: Photojournalists, Memers, Journalists, Vloggers & Cartonists
-
-📍 Venue: Silverline Prestige School, Nehru Nagar, Ghaziabad
+GLOBAL PANCHAYAT 3.0
+📅 Dates: 24th & 25th July 2026 (Friday & Saturday)
+📍 Venue: JKG International School, Indirapuram
+🎓 Eligibility: Classes 6 to 12
+💰 Delegate Fee: ₹1,800/- per student
 
 ━━━━━━━━━━━━━━━━━━━━━━
-WHY SCHOOLS LOVE SENDING THEIR STUDENTS TO RYS
+COMMITTEES & AGENDAS
 ━━━━━━━━━━━━━━━━━━━━━━
 
-Rajdhani Yuva Sansad has hosted distinguished guests including Hon'ble Union Ministers, Legislative Assembly Speakers, Members of Parliament, and senior members of the judiciary. Our events have been recognised as a meaningful platform for young students to discover their voice, build confidence, and develop critical thinking.
+FOR CLASSES 6–8:
+• Uttar Pradesh Legislative Assembly: Roadmap for Digital Governance: Fostering E-Governance & E-Literacy in the 21st Century
+• United Nations Security Council (Double Delegation): Escalating Israel-Iran Conflict & its Implications for International Peace & Security
+• Hogwarts- Ethical Boundaries of Magic: The Use of Unforgivable Curses and their Implications on Wizarding Morality
+• The Press: Photojournalists, Memers, Caricaturists, Journalists, Vloggers
 
-Your students will return with:
-✨ Participation certificates valued by colleges and universities
-✨ Real skills in research, public speaking, and listening
-✨ Lifelong memories of debating on a national stage
+FOR CLASSES 9–12:
+• AI Summit: Socio-Economic Impact of Artificial Intelligence on Employment and Skill Development
+• Lok Sabha: India's Space Programme: Scientific Advancements, Commercial Expansion & Strategic Leadership
+• Historic Stakeholders' Meet: Bhopal Gas Tragedy (Freeze Date: 3rd December, 1984)
+• International Press: Photojournalists, Memers, Caricaturists, Journalists, Vloggers
 
 ━━━━━━━━━━━━━━━━━━━━━━
-REGISTER NOW
+WHAT YOUR STUDENTS GAIN
 ━━━━━━━━━━━━━━━━━━━━━━
 
-📝 Registration Form: https://forms.gle/esaySKJLtMzmcohd8
-📋 View All Committees & Portfolios: https://docs.google.com/spreadsheets/d/1iHfu9gKiky_gOEu5eQbXOfw6aXtfE4PEiAIk1OjOC-g/edit?usp=sharing
+✅ Progression through Bloom's Taxonomy- from knowledge acquisition to drafting real policies and resolutions
+✅ Holistic, interdisciplinary learning across law, history, political science, economics, and science
+✅ Guidance from experienced Executive Board members and legal professionals
+✅ Certificates of significant academic and CV value
+✅ Exciting cash prizes for outstanding delegates
+✅ Networking with delegates and mentors from institutions across Delhi-NCR
 
-The detailed event brochure is attached. Seats are limited and allotments are made on a first-come, first-served basis - we encourage early registration:
-{{attachment_link}}
+━━━━━━━━━━━━━━━━━━━━━━
+HOW TO REGISTER
+━━━━━━━━━━━━━━━━━━━━━━
 
-For any queries, please write to us at rajdhaniyuvasansad2017@gmail.com - we'd love to connect.
+🔗 Registration Form: https://forms.gle/JjSxT95QNNNErBxL8
+📋 Committees & Portfolio Matrix: https://docs.google.com/spreadsheets/d/1iHfu9gKiky_gOEu5eQbXOfw6aXtfE4PEiAIk1OjOC-g/edit?usp=sharing
 
-Looking forward to seeing {{school}} shine on the Yuva Sajhedari stage!
+The comprehensive event brochure is attached for your reference: {{attachment_link}}
 
-With warm regards,
+We would be delighted to address any questions from you or your faculty coordinator. Please reach us at rajdhaniyuvasansad2017@gmail.com.
 
-Ms. Avni Chauhan (8744083366)
-Chief, Yuva Sajhedari 3.0
+We look forward to welcoming the bright minds of {{school}} to this transformative journey of debate, diplomacy, and discovery.
+
+Warm regards,
+
+Mr. Parv Narendra
+Chief, Global Panchayat 3.0
 Rajdhani Yuva Sansad
 rajdhaniyuvasansad2017@gmail.com
 
