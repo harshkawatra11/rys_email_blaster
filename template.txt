@@ -1,65 +1,56 @@
-Respected {{name}},
-{{school}}
+Dear {{name}},
 
 Warm greetings from Rajdhani Yuva Sansad!
 
-We are honoured to extend a formal invitation to {{school}} to participate in the third edition of GLOBAL PANCHAYAT- one of the most distinguished youth leadership conferences in the Delhi-NCR region- hosted at JKG International School, Indirapuram on 24th & 25th July 2026 (Friday and Saturday).
+You have previously been a part of the Rajdhani family, and we are thrilled to have you back for what promises to be our biggest edition yet.
 
-Over the years, Rajdhani Yuva Sansad(www.rajdhaniyuvasansad.com) has built an exceptional legacy of delivering structured, intellectually rigorous learning experiences for young delegates- with distinguished guests including Hon'ble Union Minister Sh. Arjun Ram Meghwal, Hon'ble Speakers of the Delhi and Haryana Legislative Assemblies, sitting Members of Parliament, senior members of the judiciary, and legal luminaries.
+We are excited to personally invite you to GLOBAL PANCHAYAT 3.0 — hosted at JKG International School, Indirapuram on 24th & 25th July 2026 (Friday & Saturday).
+
+This is your chance to step into the chambers of the UN Security Council, debate India's future in the Lok Sabha, unravel the Bhopal Gas Tragedy as a historic stakeholder, or break the news as a journalist at the International Press — all on a prestigious, nationally recognised stage.
 
 ━━━━━━━━━━━━━━━━━━━━━━
-ABOUT THE CONFERENCE  
+EVENT DETAILS
 ━━━━━━━━━━━━━━━━━━━━━━
 
-GLOBAL PANCHAYAT 3.0
 📅 Dates: 24th & 25th July 2026 (Friday & Saturday)
 📍 Venue: JKG International School, Indirapuram
 🎓 Eligibility: Classes 6 to 12
 💰 Delegate Fee: ₹1,800/- per student
 
 ━━━━━━━━━━━━━━━━━━━━━━
-COMMITTEES & AGENDAS
+CHOOSE YOUR COMMITTEE
 ━━━━━━━━━━━━━━━━━━━━━━
 
-FOR CLASSES 6–8:
-• Uttar Pradesh Legislative Assembly: Roadmap for Digital Governance: Fostering E-Governance & E-Literacy in the 21st Century
-• United Nations Security Council (Double Delegation): Escalating Israel-Iran Conflict & its Implications for International Peace & Security
-• Hogwarts- Ethical Boundaries of Magic: The Use of Unforgivable Curses and their Implications on Wizarding Morality
-• The Press: Photojournalists, Memers, Caricaturists, Journalists, Vloggers
+For Classes 6–8:
+• UP Legislative Assembly — Digital Governance & E-Literacy
+• UN Security Council (Double Delegation!) — Israel-Iran Conflict
+• Hogwarts — Ethics of Magic & Unforgivable Curses
+• The Press — Photojournalists, Memers, Journalists, Vloggers
 
-FOR CLASSES 9–12:
-• AI Summit: Socio-Economic Impact of Artificial Intelligence on Employment and Skill Development
-• Lok Sabha: India's Space Programme: Scientific Advancements, Commercial Expansion & Strategic Leadership
-• Historic Stakeholders' Meet: Bhopal Gas Tragedy (Freeze Date: 3rd December, 1984)
-• International Press: Photojournalists, Memers, Caricaturists, Journalists, Vloggers
-
-━━━━━━━━━━━━━━━━━━━━━━
-WHAT YOUR STUDENTS GAIN
-━━━━━━━━━━━━━━━━━━━━━━
-
-✅ Progression through Bloom's Taxonomy- from knowledge acquisition to drafting real policies and resolutions
-✅ Holistic, interdisciplinary learning across law, history, political science, economics, and science
-✅ Guidance from experienced Executive Board members and legal professionals
-✅ Certificates of significant academic and CV value
-✅ Exciting cash prizes for outstanding delegates
-✅ Networking with delegates and mentors from institutions across Delhi-NCR
+For Classes 9–12:
+• AI Summit — Artificial Intelligence & the Future of Employment
+• Lok Sabha — India's Space Programme
+• Historic Stakeholders' Meet — Bhopal Gas Tragedy (Freeze Date: 3rd Dec, 1984)
+• International Press — Photojournalists, Cartoonists, Memers, Journalists, Vloggers
 
 ━━━━━━━━━━━━━━━━━━━━━━
-HOW TO REGISTER 
+REGISTER NOW
 ━━━━━━━━━━━━━━━━━━━━━━
 
 🔗 Registration Form: https://forms.gle/JjSxT95QNNNErBxL8
 
+Don't wait — committee allotments are made on a rolling basis and seats fill up fast.
+
 The comprehensive event brochure is attached for your reference: {{attachment_link}}
 
-We would be delighted to address any questions from you or your faculty coordinator. Please reach us at rajdhaniyuvasansad2017@gmail.com.
+For any queries, reach us at rajdhaniyuvasansad2017@gmail.com or find us on Instagram @rajdhaaniyuvaasansad.
 
-We look forward to welcoming the bright minds of {{school}} to this transformative journey of debate, diplomacy, and discovery.
+We cannot wait to see you back on the floor, {{name}}. This one is going to be Bolder. Stronger. Bigger.
 
 Warm regards,
 
 Mr. Parv Narendra
-Chief, Global Panchayat 3.0
+Global Panchayat 3.0
 Rajdhani Yuva Sansad
 rajdhaniyuvasansad2017@gmail.com
 
