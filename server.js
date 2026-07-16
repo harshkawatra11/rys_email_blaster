@@ -54,28 +54,53 @@ function driveFileIdFromUrl(url) {
 }
 
 const driveDownloadCache = new Map();
+const DRIVE_FETCH_TIMEOUT_MS = 15000;
+const DRIVE_FETCH_ATTEMPTS = 3;
 
-async function downloadDriveFile(url) {
+async function downloadDriveFile(url, { requireImage = false } = {}) {
   if (!url) return null;
   if (driveDownloadCache.has(url)) return driveDownloadCache.get(url);
 
   const fileId = driveFileIdFromUrl(url);
-  if (!fileId) return null;
+  if (!fileId) {
+    console.log(`[WARN] Could not extract Drive file ID from: ${url}`);
+    return null;
+  }
 
   const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
-  const res = await fetch(downloadUrl);
-  if (!res.ok) return null;
 
-  const contentType = res.headers.get("content-type") || "application/octet-stream";
-  const disposition = res.headers.get("content-disposition") || "";
-  const nameMatch = disposition.match(/filename="?([^";]+)"?/);
-  const extFromType = contentType.split("/")[1]?.split(";")[0] || "pdf";
-  const filename = nameMatch ? nameMatch[1] : `${fileId}.${extFromType}`;
+  let lastError = null;
+  for (let attempt = 1; attempt <= DRIVE_FETCH_ATTEMPTS; attempt++) {
+    try {
+      const res = await fetch(downloadUrl, {
+        signal: AbortSignal.timeout(DRIVE_FETCH_TIMEOUT_MS),
+        headers: { "User-Agent": "Mozilla/5.0 (compatible; RysEmailBlaster/1.0)" },
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-  const buffer = Buffer.from(await res.arrayBuffer());
-  const file = { filename, mimeType: contentType, data: buffer.toString("base64") };
-  driveDownloadCache.set(url, file);
-  return file;
+      const contentType = res.headers.get("content-type") || "application/octet-stream";
+      // Drive serves an HTML interstitial (virus-scan warning, permission
+      // prompt) instead of the file itself when it doesn't like the request —
+      // catch that instead of silently embedding a broken "image".
+      if (requireImage && !contentType.startsWith("image/")) {
+        throw new Error(`Expected an image but Drive returned "${contentType}" (link may not be publicly shared, or points to an HTML page)`);
+      }
+
+      const disposition = res.headers.get("content-disposition") || "";
+      const nameMatch = disposition.match(/filename="?([^";]+)"?/);
+      const extFromType = contentType.split("/")[1]?.split(";")[0] || "pdf";
+      const filename = nameMatch ? nameMatch[1] : `${fileId}.${extFromType}`;
+
+      const buffer = Buffer.from(await res.arrayBuffer());
+      const file = { filename, mimeType: contentType, data: buffer.toString("base64") };
+      driveDownloadCache.set(url, file);
+      return file;
+    } catch (err) {
+      lastError = err;
+      console.log(`[WARN] Drive download attempt ${attempt}/${DRIVE_FETCH_ATTEMPTS} failed for ${url}: ${err.message}`);
+    }
+  }
+  throw new Error(`Failed to download from Google Drive after ${DRIVE_FETCH_ATTEMPTS} attempts: ${lastError?.message}`);
 }
 
 function makeLinkButton(href, label) {
@@ -360,23 +385,33 @@ app.post("/api/send", async (req, res) => {
     ACTIVE_JOBS[jobId] = { aborted: false };
   }
 
+  // Pre-fetch each distinct poster link once (not per-row) — a CSV of 200
+  // rows sharing one poster link would otherwise retry the same failing
+  // download hundreds of times and risk Google rate-limiting the server.
+  const posterImages = new Map();
+  const uniquePosterLinks = [...new Set(rows.map((r) => r.poster_link).filter(Boolean))];
+  for (const link of uniquePosterLinks) {
+    try {
+      posterImages.set(link, await downloadDriveFile(link, { requireImage: true }));
+      res.write(JSON.stringify({ info: `Poster fetched for embedding: ${link}` }) + "\n");
+    } catch (err) {
+      posterImages.set(link, null);
+      res.write(JSON.stringify({ info: `⚠ Could not fetch poster (will send without it): ${err.message}` }) + "\n");
+    }
+  }
+
   for (let i = 0; i < rows.length; i++) {
     if (jobId && ACTIVE_JOBS[jobId].aborted) {
       console.log(`[INFO] Job ${jobId} aborted by client. Stopping at SNO ${rows[i].sno}`);
       break;
     }
-    
+
     const row = rows[i];
 
     let body = template;
     Object.entries(row).forEach(([k, v]) => { body = body.replaceAll(`{{${k}}}`, v); });
 
-    let posterImage = null;
-    try {
-      posterImage = await downloadDriveFile(row.poster_link);
-    } catch (err) {
-      console.log(`[WARN] Failed to fetch poster for SNO ${row.sno}: ${err.message}`);
-    }
+    const posterImage = row.poster_link ? posterImages.get(row.poster_link) : null;
 
     const raw = buildRawMessage({
       from:           `"${acc.displayName}" <${acc.email}>`,

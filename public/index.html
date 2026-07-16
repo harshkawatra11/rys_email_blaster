@@ -686,7 +686,12 @@ async function sendEmails() {
           if (!line.trim()) continue;
           let r;
           try { r = JSON.parse(line); } catch(e) { continue; }
-          
+
+          if (r.info) {
+            logLine('info', r.info);
+            continue;
+          }
+
           if (r.ok) {
             sentCount++;
             logLine('ok', `✓ SNO ${r.sno} → ${r.email}`);
