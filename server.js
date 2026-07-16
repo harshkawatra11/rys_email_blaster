@@ -18,6 +18,7 @@ const CLIENT_ID     = (process.env.GOOGLE_CLIENT_ID     || "").trim();
 const CLIENT_SECRET = (process.env.GOOGLE_CLIENT_SECRET || "").trim();
 const REDIRECT_URI  = (process.env.GOOGLE_OAUTH_REDIRECT_URI || "").trim();
 const GMAIL_SEND_SCOPE = "https://www.googleapis.com/auth/gmail.send";
+const USERINFO_EMAIL_SCOPE = "https://www.googleapis.com/auth/userinfo.email";
 
 function makeOAuthClient() {
   return new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
@@ -112,7 +113,7 @@ app.get("/api/oauth/start", (req, res) => {
   const url = oauth2.generateAuthUrl({
     access_type: "offline",
     prompt: "consent",
-    scope: [GMAIL_SEND_SCOPE],
+    scope: [GMAIL_SEND_SCOPE, USERINFO_EMAIL_SCOPE],
   });
   res.redirect(url);
 });
@@ -130,9 +131,9 @@ app.get("/api/oauth/callback", async (req, res) => {
     }
     oauth2.setCredentials(tokens);
 
-    const gmail = google.gmail({ version: "v1", auth: oauth2 });
-    const profile = await gmail.users.getProfile({ userId: "me" });
-    const email = profile.data.emailAddress;
+    const oauth2Info = google.oauth2({ version: "v2", auth: oauth2 });
+    const { data: userinfo } = await oauth2Info.userinfo.get();
+    const email = userinfo.email;
     const displayName = email.split("@")[0];
 
     await accountsDb.upsertAccount({ email, displayName, refreshToken: tokens.refresh_token });
