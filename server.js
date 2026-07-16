@@ -177,15 +177,67 @@ app.get("/api/oauth/callback", async (req, res) => {
 });
 
 // ── Parse CSV ─────────────────────────────────────────────────────────────
+// Real-world sheets spell the same column many ways ("S. NO", "NAME (SAME AS
+// YOUR IDENTITY PROOF)", "School / Institution Name", "Email Address"...).
+// Recognize the columns the app actually depends on (sno for range
+// selection, email for the send address, name/institution for template
+// placeholders) regardless of punctuation/wording, falling back to a
+// generic slug for everything else.
+function canonicalizeHeader(raw) {
+  const clean = raw.trim().toLowerCase();
+  if (/^s\.?\s*no\.?$/.test(clean)) return "sno";
+  if (/email/.test(clean)) return "email";
+  if (/(institution|school)/.test(clean) && /name/.test(clean)) return "institution";
+  if (/^institution$/.test(clean)) return "institution";
+  if (/name/.test(clean)) return "name";
+  return clean.replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+}
+
+// Real spreadsheet exports quote fields containing commas (e.g. institution
+// names like "Maharaja Agrasen College, University of Delhi") — a naive
+// line.split(",") shifts every later column over for those rows. This is a
+// minimal RFC 4180-style parser: handles quoted fields, embedded commas,
+// escaped "" quotes, and quoted fields spanning multiple lines.
+function parseCsv(text) {
+  const rows = [];
+  let row = [];
+  let field = "";
+  let inQuotes = false;
+  let i = 0;
+
+  while (i < text.length) {
+    const ch = text[i];
+    if (inQuotes) {
+      if (ch === '"') {
+        if (text[i + 1] === '"') { field += '"'; i += 2; continue; }
+        inQuotes = false; i++; continue;
+      }
+      field += ch; i++; continue;
+    }
+    if (ch === '"') { inQuotes = true; i++; continue; }
+    if (ch === ",") { row.push(field); field = ""; i++; continue; }
+    if (ch === "\r") { i++; continue; }
+    if (ch === "\n") {
+      row.push(field); field = "";
+      rows.push(row); row = [];
+      i++; continue;
+    }
+    field += ch; i++;
+  }
+  if (field !== "" || row.length > 0) { row.push(field); rows.push(row); }
+  return rows.filter((r) => !(r.length === 1 && r[0].trim() === ""));
+}
+
 app.post("/api/parse-csv", upload.single("csv"), (req, res) => {
   try {
-    const text    = req.file.buffer.toString("utf-8");
-    const lines   = text.trim().split(/\r?\n/);
-    const headers = lines[0].split(",").map((h) => h.trim().toLowerCase().replace(/\s+/g, "_"));
-    const rows    = lines.slice(1).map((line) => {
-      const vals = line.split(",").map((v) => v.trim());
-      const obj  = {};
-      headers.forEach((h, i) => (obj[h] = vals[i] || ""));
+    const text  = req.file.buffer.toString("utf-8");
+    const table = parseCsv(text.trim());
+    if (table.length === 0) return res.status(400).json({ error: "CSV appears empty" });
+
+    const headers = table[0].map(canonicalizeHeader);
+    const rows    = table.slice(1).map((vals) => {
+      const obj = {};
+      headers.forEach((h, i) => (obj[h] = (vals[i] || "").trim()));
       return obj;
     });
     res.json({ headers, rows, total: rows.length });
