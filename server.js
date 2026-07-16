@@ -43,6 +43,8 @@ function makeGmailClient(acc) {
   return Buffer.from(msg).toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }*/
 
+const LOGO_URL = "https://rys-email-blaster.onrender.com/logo.png";
+
 function buildRawMessage({ from, to, subject, body, attachmentLink }) {
   // Convert plain text body to HTML (preserve line breaks)
   const htmlBody = body
@@ -53,18 +55,49 @@ function buildRawMessage({ from, to, subject, body, attachmentLink }) {
 
   // Append a clickable button if attachment link exists
   const attachmentHtml = attachmentLink
-    ? `<br><br>
-       <a href="${attachmentLink}" 
-          style="background:#4F46E5;color:#fff;padding:10px 20px;
-                 text-decoration:none;border-radius:6px;font-family:sans-serif;">
-         📎 View Attachment
-       </a>`
+    ? `<div style="text-align:center;margin:28px 0 8px;">
+         <a href="${attachmentLink}"
+            style="display:inline-block;background:#000;color:#fff;padding:12px 28px;
+                   text-decoration:none;border:1px solid #000;font-family:Georgia,'Times New Roman',serif;
+                   font-size:13px;letter-spacing:0.06em;text-transform:uppercase;">
+           View Attachment
+         </a>
+       </div>`
     : "";
 
   const html = `
-    <div style="font-family:sans-serif;font-size:14px;color:#222;">
-      ${htmlBody}
-      ${attachmentHtml}
+    <div style="background:#ffffff;padding:32px 12px;">
+      <div style="max-width:600px;margin:0 auto;font-family:Georgia,'Times New Roman',serif;color:#000;">
+
+        <div style="text-align:center;padding-bottom:20px;">
+          <img src="${LOGO_URL}" width="72" height="72" alt="Rajdhani Yuva Sansad" style="display:block;margin:0 auto 10px;" />
+          <div style="font-size:15px;font-weight:bold;letter-spacing:0.18em;text-transform:uppercase;color:#000;">
+            Rajdhani Yuva Sansad
+          </div>
+        </div>
+        <hr style="border:none;border-top:2px solid #000;margin:0 0 28px;" />
+
+        <div style="font-size:14px;line-height:1.7;color:#111;">
+          ${htmlBody}
+        </div>
+
+        ${attachmentHtml}
+
+        <hr style="border:none;border-top:1px solid #000;margin:32px 0 16px;" />
+        <div style="text-align:center;font-size:11px;letter-spacing:0.04em;color:#000;">
+          <div style="margin-bottom:6px;">RAJDHANI YUVA SANSAD</div>
+          <div>
+            <a href="https://www.rajdhaniyuvasansad.com" style="color:#000;text-decoration:underline;">Website</a>
+            &nbsp;·&nbsp;
+            <a href="https://www.instagram.com/rajdhaaniyuvaasansad" style="color:#000;text-decoration:underline;">Instagram</a>
+            &nbsp;·&nbsp;
+            <a href="https://www.facebook.com/Rajdhaniyuvasansad2017" style="color:#000;text-decoration:underline;">Facebook</a>
+            &nbsp;·&nbsp;
+            <a href="https://youtube.com/@rajdhaniyuvasansad" style="color:#000;text-decoration:underline;">YouTube</a>
+          </div>
+        </div>
+
+      </div>
     </div>`;
 
   const msg = [
