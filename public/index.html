@@ -453,7 +453,7 @@ async function loadAccounts(preselectEmail) {
 
     sel.innerHTML = '<option value="">— select an account —</option>';
     state.accounts.forEach(acc => {
-      sel.innerHTML += `<option value="${acc.id}">${acc.label} — ${acc.email}</option>`;
+      sel.innerHTML += `<option value="${acc.id}">${acc.email}</option>`;
     });
 
     if (preselectEmail) {
