@@ -5,13 +5,14 @@
   "scripts": {
     "start": "node server.js",
     "dev": "npx nodemon server.js",
-    "get-tokens": "node get-tokens.js"
+    "migrate-accounts": "node db/migrate-env-accounts.js"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "googleapis": "^140.0.0",
     "multer": "^1.4.5-lts.1",
-    "open": "^8.4.2"
+    "mysql2": "^3.23.0",
+    "pg": "^8.22.0"
   }
 }

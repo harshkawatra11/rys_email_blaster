@@ -4,6 +4,8 @@ const multer   = require("multer");
 const fs       = require("fs");
 const path     = require("path");
 const { google } = require("googleapis");
+const accountsDb = require("./db/accounts");
+const { ensureSchema } = require("./db/init");
 
 const app    = express();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -11,75 +13,18 @@ const upload = multer({ storage: multer.memoryStorage() });
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-// ── Account registry ──────────────────────────────────────────────────────
-const ACCOUNTS = {
-  tanisha: {
-    label:        "Tanisha",
-    email:        (process.env.TANISHA_EMAIL || "").trim(),
-    refreshToken: (process.env.TANISHA_REFRESH_TOKEN || "").trim(),
-    name:         (process.env.TANISHA_NAME || "Tanisha").trim(),
-  },
-  avni: {
-    label:        "Avni",
-    email:        (process.env.AVNI_EMAIL || "").trim(),
-    refreshToken: (process.env.AVNI_REFRESH_TOKEN || "").trim(),
-    name:         (process.env.AVNI_NAME || "Avni").trim(),
-  },
-  parv: {
-    label:        "Parv",
-    email:        (process.env.PARV_EMAIL || "").trim(),
-    refreshToken: (process.env.PARV_REFRESH_TOKEN || "").trim(),
-    name:         (process.env.PARV_NAME || "Parv").trim(),
-  },
-  parvv: {
-    label:        "Parvv",
-    email:        (process.env.PARVV_EMAIL || "").trim(),
-    refreshToken: (process.env.PARVV_REFRESH_TOKEN || "").trim(),
-    name:         (process.env.PARVV_NAME || "Parvv").trim(),
-  },
-  shreya: {
-    label:        "Shreya",
-    email:        (process.env.SHREYA_EMAIL || "").trim(),
-    refreshToken: (process.env.SHREYA_REFRESH_TOKEN || "").trim(),
-    name:         (process.env.SHREYA_NAME || "Shreya").trim(),
-  },
-  jatink: {
-    label:        "Jatink",
-    email:        (process.env.JATINK_EMAIL || "").trim(),
-    refreshToken: (process.env.JATINK_REFRESH_TOKEN || "").trim(),
-    name:         (process.env.JATINK_NAME || "Jatink").trim(),
-  },
-  jatin: {
-    label:        "Jatin",
-    email:        (process.env.JATIN_EMAIL || "").trim(),
-    refreshToken: (process.env.JATIN_REFRESH_TOKEN || "").trim(),
-    name:         (process.env.JATIN_NAME || "Jatin").trim(),
-  },
-  rajdhaniyuvasansad: {
-    label:        "RajdhaniYuvaSansad",
-    email:        (process.env.RAJDHANIYUVASANSAD_EMAIL || "").trim(),
-    refreshToken: (process.env.RAJDHANIYUVASANSAD_REFRESH_TOKEN || "").trim(),
-    name:         (process.env.RAJDHANIYUVASANSAD_NAME || "RajdhaniYuvaSansad").trim(),
-  },
-  kartik: {
-    label:        "Kartik",
-    email:        (process.env.KARTIK_EMAIL || "").trim(),
-    refreshToken: (process.env.KARTIK_REFRESH_TOKEN || "").trim(),
-    name:         (process.env.KARTIK_NAME || "Kartik").trim(),
-  },
-  zigyasa: {
-    label:        "Zigyasa",
-    email:        (process.env.ZIGYASA_EMAIL || "").trim(),
-    refreshToken: (process.env.ZIGYASA_REFRESH_TOKEN || "").trim(),
-    name:         (process.env.ZIGYASA_NAME || "Zigyasa").trim(),
-  },
-};
-
+// ── OAuth2 app credentials ────────────────────────────────────────────────
 const CLIENT_ID     = (process.env.GOOGLE_CLIENT_ID     || "").trim();
 const CLIENT_SECRET = (process.env.GOOGLE_CLIENT_SECRET || "").trim();
+const REDIRECT_URI  = (process.env.GOOGLE_OAUTH_REDIRECT_URI || "").trim();
+const GMAIL_SEND_SCOPE = "https://www.googleapis.com/auth/gmail.send";
+
+function makeOAuthClient() {
+  return new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
+}
 
 function makeGmailClient(acc) {
-  const oauth2 = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, "https://developers.google.com/oauthplayground");
+  const oauth2 = makeOAuthClient();
   oauth2.setCredentials({ refresh_token: acc.refreshToken });
   return google.gmail({ version: "v1", auth: oauth2 });
 }
@@ -139,6 +84,64 @@ function buildRawMessage({ from, to, subject, body, attachmentLink }) {
 
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 
+// ── Accounts ──────────────────────────────────────────────────────────────
+app.get("/api/accounts", async (req, res) => {
+  try {
+    const accounts = await accountsDb.listAccounts();
+    res.json(accounts);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to load accounts: " + err.message });
+  }
+});
+
+app.delete("/api/accounts/:id", async (req, res) => {
+  try {
+    await accountsDb.deleteAccount(req.params.id);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to delete account: " + err.message });
+  }
+});
+
+// ── OAuth: Add Account flow ──────────────────────────────────────────────
+app.get("/api/oauth/start", (req, res) => {
+  if (!CLIENT_ID || !CLIENT_SECRET || !REDIRECT_URI) {
+    return res.status(500).send("Google OAuth is not configured (missing client id/secret/redirect URI in .env)");
+  }
+  const oauth2 = makeOAuthClient();
+  const url = oauth2.generateAuthUrl({
+    access_type: "offline",
+    prompt: "consent",
+    scope: [GMAIL_SEND_SCOPE],
+  });
+  res.redirect(url);
+});
+
+app.get("/api/oauth/callback", async (req, res) => {
+  const { code, error } = req.query;
+  if (error) return res.redirect(`/?oauth=error&reason=${encodeURIComponent(error)}`);
+  if (!code) return res.redirect(`/?oauth=error&reason=missing_code`);
+
+  try {
+    const oauth2 = makeOAuthClient();
+    const { tokens } = await oauth2.getToken(code);
+    if (!tokens.refresh_token) {
+      return res.redirect(`/?oauth=error&reason=${encodeURIComponent("no_refresh_token_try_revoking_access_and_retry")}`);
+    }
+    oauth2.setCredentials(tokens);
+
+    const gmail = google.gmail({ version: "v1", auth: oauth2 });
+    const profile = await gmail.users.getProfile({ userId: "me" });
+    const email = profile.data.emailAddress;
+    const displayName = email.split("@")[0];
+
+    await accountsDb.upsertAccount({ email, displayName, refreshToken: tokens.refresh_token });
+    res.redirect(`/?oauth=success&email=${encodeURIComponent(email)}`);
+  } catch (err) {
+    res.redirect(`/?oauth=error&reason=${encodeURIComponent(err.message)}`);
+  }
+});
+
 // ── Parse CSV ─────────────────────────────────────────────────────────────
 app.post("/api/parse-csv", upload.single("csv"), (req, res) => {
   try {
@@ -170,11 +173,8 @@ app.post("/api/abort", (req, res) => {
 
 app.post("/api/send", async (req, res) => {
   const { accountId, rows, subject, jobId } = req.body;
-  if (!ACCOUNTS[accountId]) return res.status(400).json({ error: "Unknown account" });
-
-  const acc = ACCOUNTS[accountId];
-  if (!acc.email || !acc.refreshToken)
-    return res.status(500).json({ error: `Credentials for "${acc.label}" missing in .env` });
+  const acc = await accountsDb.getAccountById(accountId);
+  if (!acc) return res.status(400).json({ error: "Unknown account" });
   if (!CLIENT_ID || !CLIENT_SECRET)
     return res.status(500).json({ error: "GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET missing in .env" });
 
@@ -219,9 +219,9 @@ app.post("/api/send", async (req, res) => {
     });*/
 
     const raw = buildRawMessage({
-  from:           `"${acc.name}" <${acc.email}>`,
+  from:           `"${acc.displayName}" <${acc.email}>`,
   to:             row.email,
-  subject:        subject || `Hello from ${acc.name}`,
+  subject:        subject || `Hello from ${acc.displayName}`,
   body,
   attachmentLink: row.attachment_link || "",  // ← add this
 });
@@ -242,16 +242,18 @@ app.post("/api/send", async (req, res) => {
 
 // ── Start ──────────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`\n✉  Email Blaster → http://localhost:${PORT}`);
-  console.log(`   Tanisha            → ${ACCOUNTS.tanisha.email            || "⚠ NOT SET"}`);
-  console.log(`   Avni               → ${ACCOUNTS.avni.email               || "⚠ NOT SET"}`);
-  console.log(`   Parv               → ${ACCOUNTS.parv.email               || "⚠ NOT SET"}`);
-  console.log(`   Parvv              → ${ACCOUNTS.parvv.email              || "⚠ NOT SET"}`);
-  console.log(`   Shreya             → ${ACCOUNTS.shreya.email             || "⚠ NOT SET"}`);
-  console.log(`   Jatink             → ${ACCOUNTS.jatink.email             || "⚠ NOT SET"}`);
-  console.log(`   Jatin              → ${ACCOUNTS.jatin.email              || "⚠ NOT SET"}`);
-  console.log(`   RajdhaniYuvaSansad → ${ACCOUNTS.rajdhaniyuvasansad.email || "⚠ NOT SET"}`);
-  console.log(`   Kartik             → ${ACCOUNTS.kartik.email             || "⚠ NOT SET"}`);
-  console.log(`   Zigyasa            → ${ACCOUNTS.zigyasa.email            || "⚠ NOT SET"}\n`);
+  try {
+    await ensureSchema();
+    const accounts = await accountsDb.listAccounts();
+    if (accounts.length === 0) {
+      console.log(`   No accounts yet — click "Add account" in the app to sign in with Google.\n`);
+    } else {
+      accounts.forEach((a) => console.log(`   ${a.displayName} → ${a.email}`));
+      console.log("");
+    }
+  } catch (err) {
+    console.log(`   ⚠ Could not reach the database (${err.message}).\n`);
+  }
 });

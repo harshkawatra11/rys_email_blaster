@@ -330,6 +330,9 @@
     <div id="accInfo" class="hidden mt-12">
       <div class="acc-badge"><div class="acc-dot"></div><span id="accEmail"></span></div>
     </div>
+    <div class="btn-group mt-12">
+      <button class="btn btn-ghost" id="addAccountBtn" onclick="addAccount()">+ Add account (Continue with Google)</button>
+    </div>
     <div class="btn-group">
       <button class="btn btn-primary" id="step1Next" disabled onclick="goStep(2)">Continue →</button>
     </div>
@@ -434,26 +437,59 @@ let state = {
   currentStep: 1,
 };
 
-// ── Hardcoded accounts (no API call needed for a fixed list) ─────────────
-(function init() {
-  state.accounts = [
-    { id: 'tanisha',            label: 'Tanisha',            email: 'tanisha.rajdhaniyuvasand@gmail.com' },
-    { id: 'avni',               label: 'Avni',               email: 'avni.rajdhaniyuvasansad@gmail.com'  },
-    { id: 'parv',               label: 'Parv',               email: 'parv.rajdhaniyuvasansad@gmail.com'  },
-    { id: 'parvv',              label: 'Parvv',              email: 'parvvrajdhaniyuvaasansad@gmail.com'  },
-    { id: 'shreya',             label: 'Shreya',             email: 'shreya.rajdhaniyuvasansad@gmail.com' },
-    { id: 'jatink',             label: 'Jatink',             email: 'jatink.rajdhaniyuvasansad@gmail.com' },
-    { id: 'jatin',              label: 'Jatin',              email: 'jatin.rajdhaniyuvasansad@gmail.com' },
-    { id: 'rajdhaniyuvasansad', label: 'RajdhaniYuvaSansad', email: 'rajdhaniyuvasansad2017@gmail.com'   },
-    { id: 'kartik',             label: 'Kartik',             email: 'kartik.rajdhaniyuvasansad@gmail.com' },
-    { id: 'zigyasa',            label: 'Zigyasa',            email: 'zigyasa.rys@gmail.com' },
-  ];
+// ── Accounts (loaded dynamically from MySQL via the server) ──────────────
+async function loadAccounts(preselectEmail) {
   const sel = document.getElementById('accountSelect');
-  sel.innerHTML = '<option value="">— select an account —</option>';
-  state.accounts.forEach(acc => {
-    sel.innerHTML += `<option value="${acc.id}">${acc.label} — ${acc.email}</option>`;
-  });
+  sel.innerHTML = '<option value="">— loading accounts —</option>';
+  try {
+    const res = await fetch('/api/accounts');
+    const accounts = await res.json();
+    state.accounts = accounts.map(a => ({ id: a.id, label: a.displayName, email: a.email }));
+
+    if (state.accounts.length === 0) {
+      sel.innerHTML = '<option value="">— no accounts yet, click "Add account" —</option>';
+      return;
+    }
+
+    sel.innerHTML = '<option value="">— select an account —</option>';
+    state.accounts.forEach(acc => {
+      sel.innerHTML += `<option value="${acc.id}">${acc.label} — ${acc.email}</option>`;
+    });
+
+    if (preselectEmail) {
+      const match = state.accounts.find(a => a.email === preselectEmail);
+      if (match) sel.value = match.id;
+    }
+    onAccountChange();
+  } catch (err) {
+    sel.innerHTML = '<option value="">— failed to load accounts —</option>';
+    toast('Failed to load accounts: ' + err.message, 'error');
+  }
+}
+
+function addAccount() {
+  window.location.href = '/api/oauth/start';
+}
+
+(function init() {
+  const sel = document.getElementById('accountSelect');
   sel.addEventListener('change', onAccountChange);
+
+  const params = new URLSearchParams(window.location.search);
+  const oauthResult = params.get('oauth');
+  if (oauthResult === 'success') {
+    const email = params.get('email') || '';
+    toast('Account added: ' + email, 'success');
+    loadAccounts(email);
+  } else if (oauthResult === 'error') {
+    toast('Failed to add account: ' + (params.get('reason') || 'unknown error'), 'error');
+    loadAccounts();
+  } else {
+    loadAccounts();
+  }
+  if (oauthResult) {
+    window.history.replaceState({}, '', window.location.pathname);
+  }
 })();
 
 // ── Step navigation ───────────────────────────────────────────────────────

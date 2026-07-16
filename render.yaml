@@ -1,0 +1,24 @@
+databases:
+  - name: rys-email-blaster-db
+    plan: free
+    databaseName: email_blaster
+    user: app_user
+
+services:
+  - type: web
+    name: rys-email-blaster
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: rys-email-blaster-db
+          property: connectionString
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_OAUTH_REDIRECT_URI
+        sync: false
