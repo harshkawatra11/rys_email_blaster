@@ -11,9 +11,12 @@ let query;
 
 if (isPg) {
   const { Pool } = require("pg");
+  // Render's internal Postgres URL uses a self-signed cert on their private
+  // network (not internet-routable), so strict CA verification must be off —
+  // this is Render's own documented requirement for the internal connection.
   const rawPool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: true,
+    ssl: { rejectUnauthorized: false },
   });
   query = async (sql, params = []) => {
     const { rows } = await rawPool.query(toPgPlaceholders(sql), params);
