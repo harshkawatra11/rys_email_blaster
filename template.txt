@@ -2,7 +2,7 @@ Dear {{name}},
 
 I hope this email finds you well.
 
-On behalf of Rajdhani Yuva Sansad, we are pleased to invite {{institution}} to participate in the महिला युवा संवाद 2026, a Youth Parliament Conference on the occasion of Shaheed Diwas of Shaheed Udham Singh Ji.
+On behalf of Rajdhani Yuva Sansad, we are pleased to invite you to participate in the महिला युवा संवाद 2026, a Youth Parliament Conference on the occasion of Shaheed Diwas of Shaheed Udham Singh Ji.
 
 Venue: Haryana Vidhan Sabha
 Dates : July 31, 2026
@@ -34,7 +34,7 @@ Our organizations have hosted distinguished guests, including the Hon'ble Union 
 The Haryana Vidhan Sabha, a venue synonymous with democratic deliberation, provides a fitting setting for meaningful discussions on Haryana's pathway to sustainable growth, highlighting the imperative of balancing industrial expansion with environmental conservation and the responsible utilization of natural resources to foster long-term, inclusive development.
 Participants will engage in thought-provoking debates, share insights, and collaborate on strategies to promote social justice through education.
 
-The महिला युवा संवाद, 2026 offers a unique opportunity for students to enhance their public speaking, critical thinking, and leadership skills while discussing a topic of national importance. We believe that the insights and perspectives brought by your institution's participants will significantly enrich the discussions, contributing to the conference's overall success. Please also find attached the Rajdhani Yuva Sansad's brochure, the महिला युवा संवाद, 2026 brochure and official conference poster detailing the conference procedure and the registration form link.
+The महिला युवा संवाद, 2026 offers a unique opportunity for students to enhance their public speaking, critical thinking, and leadership skills while discussing a topic of national importance. We believe that the insights and perspectives brought by you will significantly enrich the discussions, contributing to the conference's overall success. Please find attached the Rajdhani Yuva Sansad's brochure ({{attachment_link}}), the महिला युवा संवाद, 2026 brochure and official conference poster ({{poster_link}}) detailing the conference procedure and the registration form link.
 
 Google Form Link :
 https://docs.google.com/forms/d/e/1FAIpQLScmWZm7zxNqqGnpBrgnge17IuoMF6vOrvmH8Zm5RKkcb8QXFg/viewform?usp=sharing&ouid=118269225603404277823
@@ -47,7 +47,7 @@ Candidates may present their speech either in favor of or in opposition of the a
 Candidates must also be prepared to face cross-questioning based on their delivered speech, conference agenda and general knowledge topics.
 The speech must be strictly original, non-plagiarized, and free of any AI-generated content.
 The maximum time limit is 1 minute and 30 seconds.
-We are excited about the possibility of your institution's involvement in this significant dialogue and look forward to a fruitful collaboration.
+We are excited about the possibility of your involvement in this significant dialogue and look forward to a fruitful collaboration.
 
 Thank you for considering this opportunity to engage in a meaningful conversation about education and social justice.
 
