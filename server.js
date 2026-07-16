@@ -45,7 +45,53 @@ function makeGmailClient(acc) {
 
 const LOGO_URL = "https://rys-email-blaster.onrender.com/logo.png";
 
-function buildRawMessage({ from, to, subject, body, attachmentLink }) {
+// Google Drive share links ("/file/d/<ID>/view?...") aren't direct file
+// bytes — convert to the direct-download endpoint and fetch the binary so it
+// can be embedded as a real Gmail attachment instead of just a link.
+function driveFileIdFromUrl(url) {
+  const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  return m ? m[1] : null;
+}
+
+const driveDownloadCache = new Map();
+
+async function downloadDriveFile(url) {
+  if (!url) return null;
+  if (driveDownloadCache.has(url)) return driveDownloadCache.get(url);
+
+  const fileId = driveFileIdFromUrl(url);
+  if (!fileId) return null;
+
+  const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+  const res = await fetch(downloadUrl);
+  if (!res.ok) return null;
+
+  const contentType = res.headers.get("content-type") || "application/octet-stream";
+  const disposition = res.headers.get("content-disposition") || "";
+  const nameMatch = disposition.match(/filename="?([^";]+)"?/);
+  const extFromType = contentType.split("/")[1]?.split(";")[0] || "pdf";
+  const filename = nameMatch ? nameMatch[1] : `${fileId}.${extFromType}`;
+
+  const buffer = Buffer.from(await res.arrayBuffer());
+  const file = { filename, mimeType: contentType, data: buffer.toString("base64") };
+  driveDownloadCache.set(url, file);
+  return file;
+}
+
+function makeLinkButton(href, label) {
+  return `<a href="${href}"
+             style="display:inline-block;background:#000;color:#fff;padding:12px 28px;
+                    text-decoration:none;border:1px solid #000;font-family:Georgia,'Times New Roman',serif;
+                    font-size:13px;letter-spacing:0.06em;text-transform:uppercase;">
+            View Brochure
+          </a>`;
+}
+
+// posterImage (if provided) is embedded inline via a cid: reference so it
+// renders directly in the email body when opened, not as a click-to-open
+// attachment. attachmentLink (the brochure, often large) stays a button —
+// re-uploading a multi-MB PDF to every recipient doesn't scale.
+function buildRawMessage({ from, to, subject, body, attachmentLink, posterImage }) {
   // Convert plain text body to HTML (preserve line breaks)
   const htmlBody = body
     .replace(/&/g, "&amp;")
@@ -53,16 +99,14 @@ function buildRawMessage({ from, to, subject, body, attachmentLink }) {
     .replace(/>/g, "&gt;")
     .replace(/\n/g, "<br>");
 
-  // Append a clickable button if attachment link exists
-  const attachmentHtml = attachmentLink
-    ? `<div style="text-align:center;margin:28px 0 8px;">
-         <a href="${attachmentLink}"
-            style="display:inline-block;background:#000;color:#fff;padding:12px 28px;
-                   text-decoration:none;border:1px solid #000;font-family:Georgia,'Times New Roman',serif;
-                   font-size:13px;letter-spacing:0.06em;text-transform:uppercase;">
-           View Attachment
-         </a>
+  const posterHtml = posterImage
+    ? `<div style="text-align:center;margin:24px 0;">
+         <img src="cid:poster" alt="Conference Poster" style="max-width:100%;height:auto;border:1px solid #000;" />
        </div>`
+    : "";
+
+  const buttonHtml = attachmentLink
+    ? `<div style="text-align:center;margin:20px 0 8px;">${makeLinkButton(attachmentLink)}</div>`
     : "";
 
   const html = `
@@ -81,7 +125,8 @@ function buildRawMessage({ from, to, subject, body, attachmentLink }) {
           ${htmlBody}
         </div>
 
-        ${attachmentHtml}
+        ${posterHtml}
+        ${buttonHtml}
 
         <hr style="border:none;border-top:1px solid #000;margin:32px 0 16px;" />
         <div style="text-align:center;font-size:11px;letter-spacing:0.04em;color:#000;">
@@ -100,15 +145,44 @@ function buildRawMessage({ from, to, subject, body, attachmentLink }) {
       </div>
     </div>`;
 
-  const msg = [
-    `From: ${from}`,
-    `To: ${to}`,
-    `Subject: ${subject}`,
-    `MIME-Version: 1.0`,
-    `Content-Type: text/html; charset=UTF-8`,
-    ``,
-    html,
-  ].join("\r\n");
+  let msg;
+  if (!posterImage) {
+    msg = [
+      `From: ${from}`,
+      `To: ${to}`,
+      `Subject: ${subject}`,
+      `MIME-Version: 1.0`,
+      `Content-Type: text/html; charset=UTF-8`,
+      ``,
+      html,
+    ].join("\r\n");
+  } else {
+    const boundary = `----=_Boundary_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    const parts = [
+      `--${boundary}`,
+      `Content-Type: text/html; charset=UTF-8`,
+      ``,
+      html,
+      `--${boundary}`,
+      `Content-Type: ${posterImage.mimeType}`,
+      `Content-Transfer-Encoding: base64`,
+      `Content-ID: <poster>`,
+      `Content-Disposition: inline; filename="${posterImage.filename}"`,
+      ``,
+      posterImage.data,
+      `--${boundary}--`,
+    ];
+
+    msg = [
+      `From: ${from}`,
+      `To: ${to}`,
+      `Subject: ${subject}`,
+      `MIME-Version: 1.0`,
+      `Content-Type: multipart/related; boundary="${boundary}"`,
+      ``,
+      parts.join("\r\n"),
+    ].join("\r\n");
+  }
 
   return Buffer.from(msg).toString("base64")
     .replace(/\+/g, "-")
@@ -297,20 +371,21 @@ app.post("/api/send", async (req, res) => {
     let body = template;
     Object.entries(row).forEach(([k, v]) => { body = body.replaceAll(`{{${k}}}`, v); });
 
-    /*const raw = buildRawMessage({
-      from:    `"${acc.name}" <${acc.email}>`,
-      to:      row.email,
-      subject: subject || `Hello from ${acc.name}`,
-      body,
-    });*/
+    let posterImage = null;
+    try {
+      posterImage = await downloadDriveFile(row.poster_link);
+    } catch (err) {
+      console.log(`[WARN] Failed to fetch poster for SNO ${row.sno}: ${err.message}`);
+    }
 
     const raw = buildRawMessage({
-  from:           `"${acc.displayName}" <${acc.email}>`,
-  to:             row.email,
-  subject:        subject || `Hello from ${acc.displayName}`,
-  body,
-  attachmentLink: row.attachment_link || "",  // ← add this
-});
+      from:           `"${acc.displayName}" <${acc.email}>`,
+      to:             row.email,
+      subject:        subject || `Hello from ${acc.displayName}`,
+      body,
+      attachmentLink: row.attachment_link || "",
+      posterImage,
+    });
 
     try {
       await gmail.users.messages.send({ userId: "me", requestBody: { raw } });
