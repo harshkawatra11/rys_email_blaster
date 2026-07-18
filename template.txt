@@ -1,8 +1,8 @@
-Dear {{name}},
+Dear Principal,
 
 I hope this email finds you well.
 
-On behalf of Rajdhani Yuva Sansad, we are pleased to invite you to participate in the महिला युवा संवाद 2026, a Youth Parliament Conference on the occasion of Shaheed Diwas of Shaheed Udham Singh Ji.
+On behalf of Rajdhani Yuva Sansad, we are pleased to invite your institution "{{name}}" to participate in the महिला युवा संवाद 2026, a Youth Parliament Conference on the occasion of Shaheed Diwas of Shaheed Udham Singh Ji.
 
 Venue: Haryana Vidhan Sabha
 Dates : July 31, 2026
