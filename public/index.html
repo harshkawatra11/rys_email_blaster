@@ -7,6 +7,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"
+        integrity="sha384-+VfUPEb0PdtChMwmBcBmykRMDd+v6D/oFmB3rZM/puCMDYcIvF968OimRh4KQY9a"
+        crossorigin="anonymous"></script>
 <style>
   :root {
     --bg:       #0a0a0f;
@@ -298,6 +301,44 @@
   .hidden { display: none !important; }
   .mt-12 { margin-top: 12px; }
   .mt-20 { margin-top: 20px; }
+
+  /* ── Template editor ── */
+  .tpl-section { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--border); }
+  .tpl-section-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .tpl-status { font-size: 0.68rem; color: var(--muted); letter-spacing: 0.05em; }
+  .tpl-status.saved { color: var(--accent2); }
+  .tpl-status.saving { color: var(--accent3); }
+  .tpl-status.error { color: var(--danger); }
+
+  .tpl-toolbar, .tpl-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+  .tpl-btn {
+    background: var(--bg); border: 1px solid var(--border2); color: var(--text);
+    font-family: var(--mono); font-size: 0.72rem; padding: 6px 12px;
+    border-radius: 6px; cursor: pointer; transition: all 0.15s;
+  }
+  .tpl-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .tpl-btn.active { background: rgba(124,106,247,0.15); border-color: var(--accent); color: var(--accent); }
+  .tpl-chip { font-size: 0.7rem; color: var(--accent); border-color: rgba(124,106,247,0.3); }
+
+  #tplEditor {
+    min-height: 220px; max-height: 420px; overflow-y: auto;
+    background: var(--bg); border: 1px solid var(--border2); border-radius: 7px;
+    padding: 14px; font-family: var(--mono); font-size: 0.85rem; line-height: 1.7;
+    color: var(--text); white-space: pre-wrap; word-wrap: break-word;
+    outline: none; transition: border-color 0.15s;
+  }
+  #tplEditor:focus { border-color: var(--accent); }
+  #tplEditor:empty::before { content: attr(data-placeholder); color: var(--muted); }
+
+  .poster-note { font-size: 0.72rem; color: var(--muted); margin-bottom: 14px; line-height: 1.6; }
+  .poster-or { text-align: center; font-size: 0.7rem; color: var(--muted); margin: 12px 0; letter-spacing: 0.1em; }
+  .poster-preview {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--bg); border: 1px solid var(--border2); border-radius: 8px; padding: 12px;
+  }
+  .poster-preview img { width: 64px; height: 64px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border2); }
+  .poster-preview .poster-meta { flex: 1; font-size: 0.75rem; color: var(--muted); }
+  .poster-preview .poster-meta strong { color: var(--text); display: block; margin-bottom: 2px; }
 </style>
 </head>
 <body>
@@ -333,6 +374,55 @@
     <div class="btn-group mt-12">
       <button class="btn btn-ghost" id="addAccountBtn" onclick="addAccount()">+ Add account (Continue with Google)</button>
     </div>
+
+    <!-- Message template editor -->
+    <div class="tpl-section">
+      <div class="tpl-section-head">
+        <div class="card-label" style="margin-bottom:0;">Message Template</div>
+        <span class="tpl-status" id="tplStatus">Loading…</span>
+      </div>
+
+      <div class="tpl-toolbar" id="tplToolbar">
+        <button type="button" class="tpl-btn" data-cmd="bold"><b>B</b></button>
+        <button type="button" class="tpl-btn" data-cmd="italic"><i>I</i></button>
+        <button type="button" class="tpl-btn" data-cmd="underline"><u>U</u></button>
+        <button type="button" class="tpl-btn" data-cmd="removeFormat">Clear formatting</button>
+      </div>
+
+      <div class="tpl-chips" id="tplChips"></div>
+
+      <div id="tplEditor" contenteditable="true" spellcheck="true" data-placeholder="Paste or type your email template here…"></div>
+    </div>
+
+    <!-- Global poster fallback -->
+    <div class="tpl-section">
+      <div class="card-label">Default Poster (fallback)</div>
+      <p class="poster-note">
+        Used only for recipients whose CSV row has no <code style="color:var(--accent)">poster_link</code> —
+        a row's own poster link always takes priority over this default.
+      </p>
+
+      <div class="dropzone" id="posterDrop">
+        <input type="file" id="posterFile" accept="image/png,image/jpeg,image/gif,image/webp" />
+        <div class="dropzone-icon">🖼</div>
+        <div class="dropzone-text"><strong>Click to browse</strong> or drag & drop a poster image</div>
+      </div>
+
+      <div class="poster-or">— or —</div>
+
+      <label>Google Drive share link</label>
+      <input type="text" id="posterLink" placeholder="https://drive.google.com/file/d/…/view" />
+
+      <div id="posterPreview" class="poster-preview hidden mt-12">
+        <img id="posterPreviewImg" src="" alt="Poster preview" />
+        <div class="poster-meta">
+          <strong id="posterPreviewName">—</strong>
+          <span id="posterPreviewSize"></span>
+        </div>
+        <button class="btn btn-danger" id="posterRemoveBtn" type="button" onclick="removePosterImage()">Remove</button>
+      </div>
+    </div>
+
     <div class="btn-group">
       <button class="btn btn-primary" id="step1Next" disabled onclick="goStep(2)">Continue →</button>
     </div>
@@ -342,7 +432,7 @@
   <div class="card hidden" id="step2">
     <div class="card-label">02 / Upload Recipients CSV</div>
     <p style="font-size:0.75rem; color:var(--muted); margin-bottom:16px;">
-      Expected columns: <code style="color:var(--accent)">sno, name, phone_number, school, email, attachment_link</code>
+      Expected columns: <code style="color:var(--accent)">sno, name, institution, email, attachment_link, poster_link</code>
     </p>
     <div class="dropzone" id="dropzone">
       <input type="file" id="csvFile" accept=".csv" />
@@ -437,6 +527,226 @@ let state = {
   currentStep: 1,
 };
 
+function escapeHtml(v) {
+  return String(v ?? '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// ── Template editor ───────────────────────────────────────────────────────
+// Mirrors the canonical columns produced by server.js's canonicalizeHeader().
+const PLACEHOLDER_KEYS = ['sno', 'name', 'institution', 'email', 'attachment_link', 'poster_link'];
+
+// Mirrors lib/sanitizeConfig.js on the server — this client pass is UX/
+// defense-in-depth only; the server sanitizer is the real security boundary.
+const DOMPURIFY_CONFIG = {
+  ALLOWED_TAGS: ['b', 'strong', 'i', 'em', 'u', 's', 'p', 'br', 'div', 'span', 'ul', 'ol', 'li', 'blockquote', 'h1', 'h2', 'h3', 'a'],
+  ALLOWED_ATTR: ['href', 'title', 'style'],
+  ALLOWED_URI_REGEXP: /^(?:https?|mailto):/i,
+  KEEP_CONTENT: true,
+};
+
+function sanitizeTemplateHtml(html) {
+  if (window.DOMPurify) return DOMPurify.sanitize(html || '', DOMPURIFY_CONFIG);
+  // CDN failed to load — degrade to plain text rather than trust raw HTML.
+  return escapeHtml(html || '').replace(/\n/g, '<br>');
+}
+
+const tplEditor = document.getElementById('tplEditor');
+const tplStatus = document.getElementById('tplStatus');
+let tplAutosaveEnabled = false;
+let tplSaveTimer = null;
+let tplSaveInFlight = false;
+let tplSavePending = false;
+
+function setTplStatus(text, cls) {
+  tplStatus.textContent = text;
+  tplStatus.className = 'tpl-status' + (cls ? ' ' + cls : '');
+}
+
+function renderTplChips() {
+  const chips = document.getElementById('tplChips');
+  chips.innerHTML = '';
+  PLACEHOLDER_KEYS.forEach(key => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'tpl-btn tpl-chip';
+    btn.textContent = `{{${key}}}`;
+    btn.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      insertPlaceholderChip(key);
+    });
+    chips.appendChild(btn);
+  });
+}
+
+function insertPlaceholderChip(key) {
+  tplEditor.focus();
+  const sel = window.getSelection();
+  let range;
+  if (sel.rangeCount > 0 && tplEditor.contains(sel.anchorNode)) {
+    range = sel.getRangeAt(0);
+  } else {
+    range = document.createRange();
+    range.selectNodeContents(tplEditor);
+    range.collapse(false);
+  }
+  range.deleteContents();
+  const node = document.createTextNode(`{{${key}}}`);
+  range.insertNode(node);
+  range.setStartAfter(node);
+  range.collapse(true);
+  sel.removeAllRanges();
+  sel.addRange(range);
+  scheduleTplSave();
+}
+
+function wireTplToolbar() {
+  document.execCommand('styleWithCSS', false, false);
+  document.querySelectorAll('#tplToolbar .tpl-btn').forEach(btn => {
+    btn.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      tplEditor.focus();
+      document.execCommand(btn.dataset.cmd, false, null);
+      scheduleTplSave();
+    });
+  });
+}
+
+tplEditor.addEventListener('paste', (e) => {
+  e.preventDefault();
+  const clipboard = e.clipboardData || window.clipboardData;
+  let html = clipboard.getData('text/html');
+  if (!html) {
+    const text = clipboard.getData('text/plain') || '';
+    html = escapeHtml(text).replace(/\n/g, '<br>');
+  }
+  const before = (html.match(/<img|<table/gi) || []).length;
+  const clean = sanitizeTemplateHtml(html);
+  if (before > 0) toast('Images/tables in pasted content were removed — use the poster field below for images.', 'info');
+  document.execCommand('insertHTML', false, clean);
+  scheduleTplSave();
+});
+
+tplEditor.addEventListener('input', scheduleTplSave);
+tplEditor.addEventListener('blur', flushTplSave);
+
+function scheduleTplSave() {
+  if (!tplAutosaveEnabled) return;
+  setTplStatus('Unsaved changes…');
+  clearTimeout(tplSaveTimer);
+  tplSaveTimer = setTimeout(flushTplSave, 800);
+}
+
+async function flushTplSave() {
+  if (!tplAutosaveEnabled) return;
+  clearTimeout(tplSaveTimer);
+  if (tplSaveInFlight) { tplSavePending = true; return; }
+  tplSaveInFlight = true;
+  setTplStatus('Saving…', 'saving');
+  try {
+    const res = await fetch('/api/settings', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messageTemplate: tplEditor.innerHTML,
+        posterLink: document.getElementById('posterLink').value.trim(),
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Save failed');
+    const time = new Date().toLocaleTimeString('en-GB', { hour12: false });
+    setTplStatus(`Saved ✓ ${time}`, 'saved');
+  } catch (err) {
+    setTplStatus('Not saved — ' + err.message, 'error');
+    toast('Failed to save template: ' + err.message, 'error');
+  } finally {
+    tplSaveInFlight = false;
+    if (tplSavePending) { tplSavePending = false; flushTplSave(); }
+  }
+}
+
+// ── Global poster (fallback) ─────────────────────────────────────────────
+const posterFileInput = document.getElementById('posterFile');
+const posterDrop = document.getElementById('posterDrop');
+const posterLinkInput = document.getElementById('posterLink');
+
+posterDrop.addEventListener('dragover', e => { e.preventDefault(); posterDrop.classList.add('dragover'); });
+posterDrop.addEventListener('dragleave', () => posterDrop.classList.remove('dragover'));
+posterDrop.addEventListener('drop', e => {
+  e.preventDefault(); posterDrop.classList.remove('dragover');
+  if (e.dataTransfer.files[0]) uploadPosterImage(e.dataTransfer.files[0]);
+});
+posterFileInput.addEventListener('change', () => {
+  if (posterFileInput.files[0]) uploadPosterImage(posterFileInput.files[0]);
+});
+
+async function uploadPosterImage(file) {
+  const fd = new FormData();
+  fd.append('image', file);
+  try {
+    const res = await fetch('/api/settings/poster-image', { method: 'POST', body: fd });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Upload failed');
+    posterLinkInput.value = '';
+    posterLinkInput.disabled = true;
+    renderPosterPreview(data.posterImageName, data.posterImageSize);
+    toast('Poster image uploaded', 'success');
+  } catch (err) {
+    toast('Poster upload failed: ' + err.message, 'error');
+  }
+}
+
+async function removePosterImage() {
+  try {
+    const res = await fetch('/api/settings/poster-image', { method: 'DELETE' });
+    if (!res.ok) throw new Error((await res.json()).error || 'Remove failed');
+    posterLinkInput.disabled = false;
+    document.getElementById('posterPreview').classList.add('hidden');
+    posterFileInput.value = '';
+    toast('Poster image removed', 'info');
+  } catch (err) {
+    toast('Failed to remove poster: ' + err.message, 'error');
+  }
+}
+
+function renderPosterPreview(name, size) {
+  document.getElementById('posterPreview').classList.remove('hidden');
+  document.getElementById('posterPreviewImg').src = `/api/settings/poster-image?t=${Date.now()}`;
+  document.getElementById('posterPreviewName').textContent = name || 'poster.jpg';
+  document.getElementById('posterPreviewSize').textContent = size ? `${(size / 1024).toFixed(0)} KB` : '';
+}
+
+posterLinkInput.addEventListener('input', () => {
+  const hasLink = posterLinkInput.value.trim().length > 0;
+  posterDrop.style.opacity = hasLink ? '0.5' : '1';
+  posterDrop.style.pointerEvents = hasLink ? 'none' : 'auto';
+  scheduleTplSave();
+});
+posterLinkInput.addEventListener('blur', flushTplSave);
+
+async function loadSettings() {
+  renderTplChips();
+  wireTplToolbar();
+  try {
+    const res = await fetch('/api/settings');
+    if (!res.ok) throw new Error('Failed to load settings');
+    const data = await res.json();
+    tplEditor.innerHTML = sanitizeTemplateHtml(data.messageTemplate || '');
+    posterLinkInput.value = data.posterLink || '';
+    if (data.hasPosterImage) {
+      posterLinkInput.disabled = true;
+      renderPosterPreview(data.posterImageName, data.posterImageSize);
+    }
+    setTplStatus('Saved ✓', 'saved');
+    tplAutosaveEnabled = true;
+  } catch (err) {
+    // Leave autosave disabled so a transient load failure can't blank out
+    // the saved template on the next edit.
+    setTplStatus('Could not load — editing disabled', 'error');
+    toast('Failed to load template settings: ' + err.message, 'error');
+  }
+}
+
 // ── Accounts (loaded dynamically from MySQL via the server) ──────────────
 async function loadAccounts(preselectEmail) {
   const sel = document.getElementById('accountSelect');
@@ -490,6 +800,8 @@ function addAccount() {
   if (oauthResult) {
     window.history.replaceState({}, '', window.location.pathname);
   }
+
+  loadSettings();
 })();
 
 // ── Step navigation ───────────────────────────────────────────────────────
@@ -554,7 +866,7 @@ async function handleCSV(file) {
     // Update dropzone look
     dropzone.classList.add('loaded');
     document.getElementById('dzIcon').textContent = '📊';
-    document.getElementById('dzText').innerHTML = `<strong>${file.name}</strong> loaded — ${data.total} rows`;
+    document.getElementById('dzText').innerHTML = `<strong>${escapeHtml(file.name)}</strong> loaded — ${data.total} rows`;
 
     // Build preview table (first 5 rows)
     renderTable(document.getElementById('previewWrap'), data.headers, data.rows.slice(0, 5), 'Preview (first 5 rows)');
@@ -642,7 +954,7 @@ async function sendEmails() {
 
   function logLine(type, msg) {
     const time = new Date().toLocaleTimeString('en-GB', { hour12: false });
-    log.innerHTML += `<div class="log-line"><span class="log-time log-${type}">[${time}]</span><span class="log-${type}">${msg}</span></div>`;
+    log.innerHTML += `<div class="log-line"><span class="log-time log-${type}">[${time}]</span><span class="log-${type}">${escapeHtml(msg)}</span></div>`;
     log.scrollTop = log.scrollHeight;
   }
 
@@ -763,11 +1075,11 @@ function resetForAnotherAccount() {
 // ── Helpers ───────────────────────────────────────────────────────────────
 function renderTable(container, headers, rows) {
   let html = '<table><thead><tr>';
-  headers.forEach(h => html += `<th>${h}</th>`);
+  headers.forEach(h => html += `<th>${escapeHtml(h)}</th>`);
   html += '</tr></thead><tbody>';
   rows.forEach(row => {
     html += '<tr>';
-    headers.forEach(h => html += `<td>${row[h] ?? ''}</td>`);
+    headers.forEach(h => html += `<td>${escapeHtml(row[h] ?? '')}</td>`);
     html += '</tr>';
   });
   html += '</tbody></table>';

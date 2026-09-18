@@ -1,5 +1,5 @@
-// Local dev uses MySQL (DB_HOST/DB_USER/...); Render deploys set DATABASE_URL
-// for the free managed Postgres add-on, and we switch drivers automatically.
+// Local dev uses MySQL (DB_HOST/DB_USER/...); production sets DATABASE_URL
+// for the Supabase Postgres project, and we switch drivers automatically.
 const isPg = !!process.env.DATABASE_URL;
 
 function toPgPlaceholders(sql) {
@@ -11,9 +11,9 @@ let query;
 
 if (isPg) {
   const { Pool } = require("pg");
-  // Render's internal Postgres URL uses a self-signed cert on their private
-  // network (not internet-routable), so strict CA verification must be off —
-  // this is Render's own documented requirement for the internal connection.
+  // Supabase's pooled connection presents a cert chain that isn't always
+  // resolvable via the default local CA store from this driver setup, so
+  // strict CA verification is left off here (standard for this setup).
   const rawPool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false },

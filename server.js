@@ -5,12 +5,24 @@ const fs       = require("fs");
 const path     = require("path");
 const { google } = require("googleapis");
 const accountsDb = require("./db/accounts");
+const settingsDb = require("./db/settings");
 const { ensureSchema } = require("./db/init");
+const { sanitizeTemplateHtml } = require("./lib/sanitizeConfig");
 
 const app    = express();
 const upload = multer({ storage: multer.memoryStorage() });
 
-app.use(express.json());
+const POSTER_IMAGE_MAX_BYTES = 2 * 1024 * 1024; // 2MB — re-sent inline to every recipient
+const imageUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: POSTER_IMAGE_MAX_BYTES, files: 1 },
+  fileFilter: (req, file, cb) => {
+    if (/^image\/(png|jpeg|gif|webp)$/.test(file.mimetype)) return cb(null, true);
+    cb(new Error("Only PNG, JPEG, GIF, or WEBP images are allowed"));
+  },
+});
+
+app.use(express.json({ limit: "1mb" }));
 app.use(express.static(path.join(__dirname, "public")));
 
 // ── OAuth2 app credentials ────────────────────────────────────────────────
@@ -116,14 +128,9 @@ function makeLinkButton(href, label) {
 // renders directly in the email body when opened, not as a click-to-open
 // attachment. attachmentLink (the brochure, often large) stays a button —
 // re-uploading a multi-MB PDF to every recipient doesn't scale.
-function buildRawMessage({ from, to, subject, body, attachmentLink, posterImage }) {
-  // Convert plain text body to HTML (preserve line breaks)
-  const htmlBody = body
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/\n/g, "<br>");
-
+// bodyHtml is pre-sanitized HTML (see lib/sanitizeConfig.js); callers are
+// responsible for HTML-escaping any values interpolated into it beforehand.
+function buildRawMessage({ from, to, subject, bodyHtml, attachmentLink, posterImage }) {
   const posterHtml = posterImage
     ? `<div style="text-align:center;margin:24px 0;">
          <img src="cid:poster" alt="Conference Poster" style="max-width:100%;height:auto;border:1px solid #000;" />
@@ -147,7 +154,7 @@ function buildRawMessage({ from, to, subject, body, attachmentLink, posterImage 
         <hr style="border:none;border-top:2px solid #000;margin:0 0 28px;" />
 
         <div style="font-size:14px;line-height:1.7;color:#111;">
-          ${htmlBody}
+          ${bodyHtml}
         </div>
 
         ${posterHtml}
@@ -217,6 +224,30 @@ function buildRawMessage({ from, to, subject, body, attachmentLink, posterImage 
 
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 
+function escapeHtml(v) {
+  return String(v ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+// The template is now rich HTML, so a naive replaceAll(`{{key}}`) misses
+// placeholders that got partially formatted (e.g. only half of {{name}}
+// bolded splits it into "{{<b>name</b>}}"). This strips any tags that
+// leaked inside the braces before matching, and HTML-escapes the
+// substituted value since it's now landing directly inside markup.
+// Unknown/unmatched keys are left literal, matching the old behavior.
+function fillTemplate(html, row) {
+  return html.replace(/\{\{\s*((?:<[^>]*>|[^{}<>])*?)\s*\}\}/g, (match, inner) => {
+    const key = inner.replace(/<[^>]*>/g, "").trim();
+    if (key && Object.prototype.hasOwnProperty.call(row, key)) {
+      return escapeHtml(row[key]);
+    }
+    return match;
+  });
+}
+
 // ── Accounts ──────────────────────────────────────────────────────────────
 app.get("/api/accounts", async (req, res) => {
   try {
@@ -233,6 +264,69 @@ app.delete("/api/accounts/:id", async (req, res) => {
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: "Failed to delete account: " + err.message });
+  }
+});
+
+// ── Settings (message template + global poster fallback) ──────────────────
+app.get("/api/settings", async (req, res) => {
+  try {
+    const settings = await settingsDb.getSettings();
+    res.json(settings || { messageTemplate: "", posterLink: "", hasPosterImage: false });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to load settings: " + err.message });
+  }
+});
+
+app.put("/api/settings", async (req, res) => {
+  try {
+    const { messageTemplate, posterLink } = req.body;
+    const cleanLink = (posterLink || "").trim();
+    if (cleanLink && !driveFileIdFromUrl(cleanLink)) {
+      return res.status(400).json({ error: "That doesn't look like a valid Google Drive share link" });
+    }
+    const cleanTemplate = sanitizeTemplateHtml(messageTemplate || "");
+    await settingsDb.saveSettings({ messageTemplate: cleanTemplate, posterLink: cleanLink });
+    if (cleanLink) await settingsDb.clearPosterImage(); // link and uploaded image are mutually exclusive
+    res.json({ ok: true, messageTemplate: cleanTemplate });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to save settings: " + err.message });
+  }
+});
+
+app.post("/api/settings/poster-image", imageUpload.single("image"), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: "No image file provided" });
+    await settingsDb.setPosterImage({
+      base64: req.file.buffer.toString("base64"),
+      mimeType: req.file.mimetype,
+      filename: req.file.originalname,
+      size: req.file.size,
+    });
+    res.json({ ok: true, posterImageName: req.file.originalname, posterImageMime: req.file.mimetype, posterImageSize: req.file.size });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to save poster image: " + err.message });
+  }
+});
+
+app.delete("/api/settings/poster-image", async (req, res) => {
+  try {
+    await settingsDb.clearPosterImage();
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to remove poster image: " + err.message });
+  }
+});
+
+app.get("/api/settings/poster-image", async (req, res) => {
+  try {
+    const image = await settingsDb.getPosterImage();
+    if (!image) return res.status(404).end();
+    res.setHeader("Content-Type", image.mimeType || "application/octet-stream");
+    res.setHeader("Cache-Control", "no-store");
+    res.setHeader("Content-Disposition", "inline");
+    res.end(Buffer.from(image.base64, "base64"));
+  } catch (err) {
+    res.status(500).json({ error: "Failed to load poster image: " + err.message });
   }
 });
 
@@ -363,11 +457,19 @@ app.post("/api/send", async (req, res) => {
   if (!CLIENT_ID || !CLIENT_SECRET)
     return res.status(500).json({ error: "GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET missing in .env" });
 
-  const templatePath = path.join(__dirname, "template.txt");
-  if (!fs.existsSync(templatePath))
-    return res.status(500).json({ error: "template.txt not found" });
+  const settings = await settingsDb.getSettings();
+  let template = settings?.messageTemplate || "";
+  if (!template) {
+    // Degrade gracefully to the legacy file if the settings row is somehow
+    // empty, rather than sending a blank email body.
+    const templatePath = path.join(__dirname, "template.txt");
+    if (fs.existsSync(templatePath)) {
+      template = fs.readFileSync(templatePath, "utf-8")
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
+    }
+  }
+  template = sanitizeTemplateHtml(template);
 
-  const template   = fs.readFileSync(templatePath, "utf-8");
   const gmail      = makeGmailClient(acc);
   const EMAIL_DELAY = 2000; // ms between each email
 
@@ -400,6 +502,24 @@ app.post("/api/send", async (req, res) => {
     }
   }
 
+  // Resolve one global poster (used only for rows that don't supply their
+  // own poster_link) — skip entirely if every row already has its own link,
+  // to avoid paying for a Drive fetch nobody needs.
+  let globalPoster = null;
+  if (rows.some((r) => !r.poster_link)) {
+    const storedImage = await settingsDb.getPosterImage();
+    if (storedImage) {
+      globalPoster = { filename: storedImage.filename, mimeType: storedImage.mimeType, data: storedImage.base64 };
+    } else if (settings?.posterLink) {
+      try {
+        globalPoster = await downloadDriveFile(settings.posterLink, { requireImage: true });
+        res.write(JSON.stringify({ info: `Default poster fetched for embedding: ${settings.posterLink}` }) + "\n");
+      } catch (err) {
+        res.write(JSON.stringify({ info: `⚠ Could not fetch default poster (will send without it): ${err.message}` }) + "\n");
+      }
+    }
+  }
+
   for (let i = 0; i < rows.length; i++) {
     if (jobId && ACTIVE_JOBS[jobId].aborted) {
       console.log(`[INFO] Job ${jobId} aborted by client. Stopping at SNO ${rows[i].sno}`);
@@ -408,16 +528,15 @@ app.post("/api/send", async (req, res) => {
 
     const row = rows[i];
 
-    let body = template;
-    Object.entries(row).forEach(([k, v]) => { body = body.replaceAll(`{{${k}}}`, v); });
+    const bodyHtml = fillTemplate(template, row);
 
-    const posterImage = row.poster_link ? posterImages.get(row.poster_link) : null;
+    const posterImage = (row.poster_link && posterImages.get(row.poster_link)) || globalPoster || null;
 
     const raw = buildRawMessage({
       from:           `"${acc.displayName}" <${acc.email}>`,
       to:             row.email,
       subject:        subject || `Hello from ${acc.displayName}`,
-      body,
+      bodyHtml,
       attachmentLink: row.attachment_link || "",
       posterImage,
     });
@@ -434,6 +553,16 @@ app.post("/api/send", async (req, res) => {
   }
 
   res.end();
+});
+
+// Multer errors (oversize/invalid upload) should come back as JSON, not
+// Express's default HTML error page, so the frontend's res.json() doesn't
+// choke on an unexpected content type. Must be registered after all routes.
+app.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError || (err && /image/i.test(err.message || ""))) {
+    return res.status(400).json({ error: err.message });
+  }
+  next(err);
 });
 
 // ── Start ──────────────────────────────────────────────────────────────────
