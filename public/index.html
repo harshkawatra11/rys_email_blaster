@@ -319,6 +319,7 @@
   .tpl-btn:hover { border-color: var(--accent); color: var(--accent); }
   .tpl-btn.active { background: rgba(124,106,247,0.15); border-color: var(--accent); color: var(--accent); }
   .tpl-chip { font-size: 0.7rem; color: var(--accent); border-color: rgba(124,106,247,0.3); }
+  .tpl-chip-dynamic { color: var(--accent3); border-color: rgba(249,115,22,0.35); }
 
   #tplEditor {
     min-height: 220px; max-height: 420px; overflow-y: auto;
@@ -331,14 +332,22 @@
   #tplEditor:empty::before { content: attr(data-placeholder); color: var(--muted); }
 
   .poster-note { font-size: 0.72rem; color: var(--muted); margin-bottom: 14px; line-height: 1.6; }
-  .poster-or { text-align: center; font-size: 0.7rem; color: var(--muted); margin: 12px 0; letter-spacing: 0.1em; }
+  .poster-group-head {
+    display: flex; align-items: center; justify-content: space-between; margin: 16px 0 8px;
+    font-size: 0.72rem; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase;
+  }
   .poster-preview {
     display: flex; align-items: center; gap: 14px;
     background: var(--bg); border: 1px solid var(--border2); border-radius: 8px; padding: 12px;
+    margin-bottom: 10px;
   }
   .poster-preview img { width: 64px; height: 64px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border2); }
   .poster-preview .poster-meta { flex: 1; font-size: 0.75rem; color: var(--muted); }
   .poster-preview .poster-meta strong { color: var(--text); display: block; margin-bottom: 2px; }
+  .poster-link-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
+  .poster-link-row input { flex: 1; }
+  .poster-link-row input.error { border-color: var(--danger); }
+  .dropzone.compact { padding: 18px 16px; margin-bottom: 10px; }
 </style>
 </head>
 <body>
@@ -394,33 +403,26 @@
       <div id="tplEditor" contenteditable="true" spellcheck="true" data-placeholder="Paste or type your email template here…"></div>
     </div>
 
-    <!-- Global poster fallback -->
+    <!-- Global poster fallback (repeatable list) -->
     <div class="tpl-section">
-      <div class="card-label">Default Poster (fallback)</div>
+      <div class="card-label">Default Posters (fallback)</div>
       <p class="poster-note">
-        Used only for recipients whose CSV row has no <code style="color:var(--accent)">poster_link</code> —
-        a row's own poster link always takes priority over this default.
+        Used only for recipients whose CSV row has no <code style="color:var(--accent)">poster_link</code> /
+        <code style="color:var(--accent)">poster_link_1</code>, etc. — a row's own poster link(s) always take
+        priority over these defaults. Posters stack top-to-bottom in the order shown here (uploads first, then links).
       </p>
 
-      <div class="dropzone" id="posterDrop">
-        <input type="file" id="posterFile" accept="image/png,image/jpeg,image/gif,image/webp" />
-        <div class="dropzone-icon">🖼</div>
-        <div class="dropzone-text"><strong>Click to browse</strong> or drag & drop a poster image</div>
+      <div class="poster-group-head">
+        <span>Uploaded images</span>
+        <button type="button" class="tpl-btn" id="posterAddImageBtn">+ Add image</button>
       </div>
+      <div id="posterImageList"></div>
 
-      <div class="poster-or">— or —</div>
-
-      <label>Google Drive share link</label>
-      <input type="text" id="posterLink" placeholder="https://drive.google.com/file/d/…/view" />
-
-      <div id="posterPreview" class="poster-preview hidden mt-12">
-        <img id="posterPreviewImg" src="" alt="Poster preview" />
-        <div class="poster-meta">
-          <strong id="posterPreviewName">—</strong>
-          <span id="posterPreviewSize"></span>
-        </div>
-        <button class="btn btn-danger" id="posterRemoveBtn" type="button" onclick="removePosterImage()">Remove</button>
+      <div class="poster-group-head">
+        <span>Google Drive links</span>
+        <button type="button" class="tpl-btn" id="posterAddLinkBtn">+ Add link</button>
       </div>
+      <div id="posterLinkList"></div>
     </div>
 
     <div class="btn-group">
@@ -432,7 +434,8 @@
   <div class="card hidden" id="step2">
     <div class="card-label">02 / Upload Recipients CSV</div>
     <p style="font-size:0.75rem; color:var(--muted); margin-bottom:16px;">
-      Expected columns: <code style="color:var(--accent)">sno, name, institution, email, attachment_link, poster_link</code>
+      Expected columns: <code style="color:var(--accent)">sno (auto-numbered if absent), name, institution, email, attachment_link[_N], poster_link[_N]</code>
+      — numbered columns like <code style="color:var(--accent)">attachment_link_1</code>, <code style="color:var(--accent)">attachment_link_2</code> are all detected automatically.
     </p>
     <div class="dropzone" id="dropzone">
       <input type="file" id="csvFile" accept=".csv" />
@@ -443,6 +446,7 @@
       <div class="stat-row">
         <div class="stat-chip green">Total rows <strong id="totalRows">—</strong></div>
         <div class="stat-chip">File <strong id="fileName">—</strong></div>
+        <div class="stat-chip hidden" id="snoAutoChip">S.No. auto-numbered (no S.NO. column in file)</div>
       </div>
       <div class="table-wrap mt-12" id="previewWrap"></div>
     </div>
@@ -563,20 +567,22 @@ function setTplStatus(text, cls) {
   tplStatus.className = 'tpl-status' + (cls ? ' ' + cls : '');
 }
 
-function renderTplChips() {
+function renderTplChips(extraKeys = []) {
   const chips = document.getElementById('tplChips');
   chips.innerHTML = '';
-  PLACEHOLDER_KEYS.forEach(key => {
+  const addChip = (key, dynamic) => {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'tpl-btn tpl-chip';
+    btn.className = 'tpl-btn tpl-chip' + (dynamic ? ' tpl-chip-dynamic' : '');
     btn.textContent = `{{${key}}}`;
     btn.addEventListener('mousedown', (e) => {
       e.preventDefault();
       insertPlaceholderChip(key);
     });
     chips.appendChild(btn);
-  });
+  };
+  PLACEHOLDER_KEYS.forEach(key => addChip(key, false));
+  extraKeys.filter(k => !PLACEHOLDER_KEYS.includes(k)).forEach(key => addChip(key, true));
 }
 
 function insertPlaceholderChip(key) {
@@ -647,10 +653,7 @@ async function flushTplSave() {
     const res = await fetch('/api/settings', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        messageTemplate: tplEditor.innerHTML,
-        posterLink: document.getElementById('posterLink').value.trim(),
-      }),
+      body: JSON.stringify({ messageTemplate: tplEditor.innerHTML }),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Save failed');
@@ -665,64 +668,152 @@ async function flushTplSave() {
   }
 }
 
-// ── Global poster (fallback) ─────────────────────────────────────────────
-const posterFileInput = document.getElementById('posterFile');
-const posterDrop = document.getElementById('posterDrop');
-const posterLinkInput = document.getElementById('posterLink');
+// ── Global posters (repeatable fallback list) ─────────────────────────────
+const posterImageList = document.getElementById('posterImageList');
+const posterLinkList = document.getElementById('posterLinkList');
+const posterAddImageBtn = document.getElementById('posterAddImageBtn');
+const posterAddLinkBtn = document.getElementById('posterAddLinkBtn');
 
-posterDrop.addEventListener('dragover', e => { e.preventDefault(); posterDrop.classList.add('dragover'); });
-posterDrop.addEventListener('dragleave', () => posterDrop.classList.remove('dragover'));
-posterDrop.addEventListener('drop', e => {
-  e.preventDefault(); posterDrop.classList.remove('dragover');
-  if (e.dataTransfer.files[0]) uploadPosterImage(e.dataTransfer.files[0]);
-});
-posterFileInput.addEventListener('change', () => {
-  if (posterFileInput.files[0]) uploadPosterImage(posterFileInput.files[0]);
-});
+function isValidDriveLink(link) {
+  return /\/d\/[a-zA-Z0-9_-]+/.test(link) || /[?&]id=[a-zA-Z0-9_-]+/.test(link);
+}
 
-async function uploadPosterImage(file) {
-  const fd = new FormData();
-  fd.append('image', file);
-  try {
-    const res = await fetch('/api/settings/poster-image', { method: 'POST', body: fd });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Upload failed');
-    posterLinkInput.value = '';
-    posterLinkInput.disabled = true;
-    renderPosterPreview(data.posterImageName, data.posterImageSize);
-    toast('Poster image uploaded', 'success');
-  } catch (err) {
-    toast('Poster upload failed: ' + err.message, 'error');
+function wireDropzone(el, input, onFile) {
+  el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('dragover'); });
+  el.addEventListener('dragleave', () => el.classList.remove('dragover'));
+  el.addEventListener('drop', e => {
+    e.preventDefault(); el.classList.remove('dragover');
+    if (e.dataTransfer.files[0]) onFile(e.dataTransfer.files[0]);
+  });
+  input.addEventListener('change', () => { if (input.files[0]) onFile(input.files[0]); });
+}
+
+function addEmptyImageSlot() {
+  const wrap = document.createElement('div');
+  wrap.className = 'dropzone compact';
+  wrap.innerHTML = `
+    <input type="file" accept="image/png,image/jpeg,image/gif,image/webp" />
+    <div class="dropzone-icon">🖼</div>
+    <div class="dropzone-text"><strong>Click to browse</strong> or drag & drop a poster image</div>
+  `;
+  posterImageList.appendChild(wrap);
+  const input = wrap.querySelector('input');
+  wireDropzone(wrap, input, async (file) => {
+    const fd = new FormData();
+    fd.append('image', file);
+    try {
+      const res = await fetch('/api/settings/posters/image', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Upload failed');
+      wrap.replaceWith(renderImageItem(data));
+      toast('Poster image uploaded', 'success');
+    } catch (err) {
+      toast('Poster upload failed: ' + err.message, 'error');
+    }
+  });
+  return wrap;
+}
+
+function renderImageItem(item) {
+  const row = document.createElement('div');
+  row.className = 'poster-preview';
+  row.dataset.id = item.id;
+  row.innerHTML = `
+    <img src="/api/settings/posters/${item.id}/image?t=${Date.now()}" alt="Poster preview" />
+    <div class="poster-meta">
+      <strong>${escapeHtml(item.imageName || 'poster.jpg')}</strong>
+      <span>${item.imageSize ? (item.imageSize / 1024).toFixed(0) + ' KB' : ''}</span>
+    </div>
+    <button class="btn btn-danger" type="button">Remove</button>
+  `;
+  row.querySelector('button').addEventListener('click', async () => {
+    try {
+      const res = await fetch(`/api/settings/posters/${item.id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error((await res.json()).error || 'Remove failed');
+      row.remove();
+      if (!posterImageList.children.length) addEmptyImageSlot();
+      toast('Poster image removed', 'info');
+    } catch (err) {
+      toast('Failed to remove poster: ' + err.message, 'error');
+    }
+  });
+  return row;
+}
+
+function addLinkRow(item) {
+  const row = document.createElement('div');
+  row.className = 'poster-link-row';
+  row.dataset.id = item?.id || '';
+  row.innerHTML = `
+    <input type="text" placeholder="https://drive.google.com/file/d/…/view" value="${escapeHtml(item?.link || '')}" />
+    <button class="btn btn-danger" type="button">Remove</button>
+  `;
+  posterLinkList.appendChild(row);
+  const input = row.querySelector('input');
+  const removeBtn = row.querySelector('button');
+
+  let saveTimer = null, inFlight = false, pending = false;
+  const flush = async () => {
+    clearTimeout(saveTimer);
+    const link = input.value.trim();
+    if (!link) return; // never-saved empty row — nothing to persist
+    if (!isValidDriveLink(link)) { input.classList.add('error'); return; }
+    input.classList.remove('error');
+    if (inFlight) { pending = true; return; }
+    inFlight = true;
+    try {
+      if (row.dataset.id) {
+        const res = await fetch(`/api/settings/posters/${row.dataset.id}/link`, {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ link }),
+        });
+        if (!res.ok) throw new Error((await res.json()).error || 'Save failed');
+      } else {
+        const res = await fetch('/api/settings/posters/link', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ link }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Save failed');
+        row.dataset.id = data.id;
+      }
+    } catch (err) {
+      toast('Failed to save poster link: ' + err.message, 'error');
+    } finally {
+      inFlight = false;
+      if (pending) { pending = false; flush(); }
+    }
+  };
+  input.addEventListener('input', () => { clearTimeout(saveTimer); saveTimer = setTimeout(flush, 800); });
+  input.addEventListener('blur', flush);
+  removeBtn.addEventListener('click', async () => {
+    if (row.dataset.id) {
+      try {
+        const res = await fetch(`/api/settings/posters/${row.dataset.id}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error((await res.json()).error || 'Remove failed');
+      } catch (err) {
+        toast('Failed to remove poster link: ' + err.message, 'error');
+        return;
+      }
+    }
+    row.remove();
+  });
+  return row;
+}
+
+posterAddImageBtn.addEventListener('click', () => addEmptyImageSlot());
+posterAddLinkBtn.addEventListener('click', () => addLinkRow(null).querySelector('input').focus());
+
+function renderGlobalPosters(items) {
+  posterImageList.innerHTML = '';
+  posterLinkList.innerHTML = '';
+  const images = items.filter(i => i.kind === 'image');
+  const links = items.filter(i => i.kind === 'link');
+  if (images.length === 0) {
+    addEmptyImageSlot();
+  } else {
+    images.forEach(item => posterImageList.appendChild(renderImageItem(item)));
   }
+  links.forEach(item => addLinkRow(item));
 }
-
-async function removePosterImage() {
-  try {
-    const res = await fetch('/api/settings/poster-image', { method: 'DELETE' });
-    if (!res.ok) throw new Error((await res.json()).error || 'Remove failed');
-    posterLinkInput.disabled = false;
-    document.getElementById('posterPreview').classList.add('hidden');
-    posterFileInput.value = '';
-    toast('Poster image removed', 'info');
-  } catch (err) {
-    toast('Failed to remove poster: ' + err.message, 'error');
-  }
-}
-
-function renderPosterPreview(name, size) {
-  document.getElementById('posterPreview').classList.remove('hidden');
-  document.getElementById('posterPreviewImg').src = `/api/settings/poster-image?t=${Date.now()}`;
-  document.getElementById('posterPreviewName').textContent = name || 'poster.jpg';
-  document.getElementById('posterPreviewSize').textContent = size ? `${(size / 1024).toFixed(0)} KB` : '';
-}
-
-posterLinkInput.addEventListener('input', () => {
-  const hasLink = posterLinkInput.value.trim().length > 0;
-  posterDrop.style.opacity = hasLink ? '0.5' : '1';
-  posterDrop.style.pointerEvents = hasLink ? 'none' : 'auto';
-  scheduleTplSave();
-});
-posterLinkInput.addEventListener('blur', flushTplSave);
 
 async function loadSettings() {
   renderTplChips();
@@ -732,11 +823,7 @@ async function loadSettings() {
     if (!res.ok) throw new Error('Failed to load settings');
     const data = await res.json();
     tplEditor.innerHTML = sanitizeTemplateHtml(data.messageTemplate || '');
-    posterLinkInput.value = data.posterLink || '';
-    if (data.hasPosterImage) {
-      posterLinkInput.disabled = true;
-      renderPosterPreview(data.posterImageName, data.posterImageSize);
-    }
+    renderGlobalPosters(data.globalPosters || []);
     setTplStatus('Saved ✓', 'saved');
     tplAutosaveEnabled = true;
   } catch (err) {
@@ -862,6 +949,7 @@ async function handleCSV(file) {
     state.csvRows = data.rows;
     document.getElementById('totalRows').textContent = data.total;
     document.getElementById('fileName').textContent = file.name;
+    document.getElementById('snoAutoChip').classList.toggle('hidden', !data.snoAutoGenerated);
 
     // Update dropzone look
     dropzone.classList.add('loaded');
@@ -872,6 +960,11 @@ async function handleCSV(file) {
     renderTable(document.getElementById('previewWrap'), data.headers, data.rows.slice(0, 5), 'Preview (first 5 rows)');
     document.getElementById('csvStats').classList.remove('hidden');
     document.getElementById('step2Next').disabled = false;
+
+    // Surface any CSV columns not already covered by the base placeholder
+    // chips (e.g. attachment_link_1/_2) — Step 1 is reachable again via
+    // "← Back" or "Send Another Batch" with this CSV still loaded.
+    renderTplChips(data.headers);
 
     // Pre-fill range
     const snos = data.rows.map(r => +r.sno).filter(Boolean);

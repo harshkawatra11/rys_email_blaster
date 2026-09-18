@@ -6,6 +6,7 @@ const path     = require("path");
 const { google } = require("googleapis");
 const accountsDb = require("./db/accounts");
 const settingsDb = require("./db/settings");
+const globalPostersDb = require("./db/globalPosters");
 const { ensureSchema } = require("./db/init");
 const { sanitizeTemplateHtml } = require("./lib/sanitizeConfig");
 
@@ -21,6 +22,9 @@ const imageUpload = multer({
     cb(new Error("Only PNG, JPEG, GIF, or WEBP images are allowed"));
   },
 });
+
+const MAX_GLOBAL_POSTERS = 6; // bounds per-email size (see buildRawMessage)
+const MAX_LINKS_PER_ROW = 10; // bounds a crafted client payload's outbound fetches
 
 app.use(express.json({ limit: "1mb" }));
 app.use(express.static(path.join(__dirname, "public")));
@@ -116,29 +120,46 @@ async function downloadDriveFile(url, { requireImage = false } = {}) {
 }
 
 function makeLinkButton(href, label) {
-  return `<a href="${href}"
+  return `<a href="${escapeHtml(href)}"
              style="display:inline-block;background:#000;color:#fff;padding:12px 28px;
                     text-decoration:none;border:1px solid #000;font-family:Georgia,'Times New Roman',serif;
-                    font-size:13px;letter-spacing:0.06em;text-transform:uppercase;">
-            View Brochure
+                    font-size:13px;letter-spacing:0.06em;text-transform:uppercase;margin:4px;">
+            ${escapeHtml(label || "View Brochure")}
           </a>`;
 }
 
-// posterImage (if provided) is embedded inline via a cid: reference so it
-// renders directly in the email body when opened, not as a click-to-open
-// attachment. attachmentLink (the brochure, often large) stays a button —
-// re-uploading a multi-MB PDF to every recipient doesn't scale.
-// bodyHtml is pre-sanitized HTML (see lib/sanitizeConfig.js); callers are
-// responsible for HTML-escaping any values interpolated into it beforehand.
-function buildRawMessage({ from, to, subject, bodyHtml, attachmentLink, posterImage }) {
-  const posterHtml = posterImage
-    ? `<div style="text-align:center;margin:24px 0;">
-         <img src="cid:poster" alt="Conference Poster" style="max-width:100%;height:auto;border:1px solid #000;" />
-       </div>`
-    : "";
+// Filenames land inside a MIME header (Content-Disposition), so CR/LF or a
+// stray quote could break out of the header entirely — strip them.
+function sanitizeFilename(name) {
+  return String(name || "attachment").replace(/["\r\n]/g, "");
+}
 
-  const buttonHtml = attachmentLink
-    ? `<div style="text-align:center;margin:20px 0 8px;">${makeLinkButton(attachmentLink)}</div>`
+// RFC 2045 recommends wrapping base64 body lines at 76 chars — most mail
+// servers tolerate an unwrapped multi-MB line, but this is cheap insurance
+// once a message can carry several embedded images instead of one.
+function wrapBase64(data) {
+  return data.replace(/.{76}/g, "$&\r\n");
+}
+
+// posterImages (if provided) are embedded inline via cid: references so they
+// render directly in the email body when opened, not as click-to-open
+// attachments, stacked vertically in the order given. attachmentLinks (the
+// brochures, often large) stay buttons — re-uploading a multi-MB PDF to
+// every recipient doesn't scale. A single link/poster renders exactly as
+// before (unnumbered label, cid "poster0") for backward compatibility.
+// bodyHtml is pre-sanitized HTML (see lib/sanitizeConfig.js); callers are
+// responsible for HTML-escaping any other values interpolated into it.
+function buildRawMessage({ from, to, subject, bodyHtml, attachmentLinks = [], posterImages = [] }) {
+  const posterHtml = posterImages
+    .map((img, i) => `<div style="text-align:center;margin:24px 0;">
+         <img src="cid:poster${i}" alt="${posterImages.length > 1 ? `Conference Poster ${i + 1}` : "Conference Poster"}" style="max-width:100%;height:auto;border:1px solid #000;" />
+       </div>`)
+    .join("");
+
+  const buttonHtml = attachmentLinks.length
+    ? `<div style="text-align:center;margin:20px 0 8px;">${attachmentLinks
+        .map((link, i) => makeLinkButton(link, attachmentLinks.length > 1 ? `View Brochure ${i + 1}` : "View Brochure"))
+        .join(attachmentLinks.length > 1 ? "<br/>" : "")}</div>`
     : "";
 
   const html = `
@@ -178,7 +199,7 @@ function buildRawMessage({ from, to, subject, bodyHtml, attachmentLink, posterIm
     </div>`;
 
   let msg;
-  if (!posterImage) {
+  if (posterImages.length === 0) {
     msg = [
       `From: ${from}`,
       `To: ${to}`,
@@ -190,18 +211,21 @@ function buildRawMessage({ from, to, subject, bodyHtml, attachmentLink, posterIm
     ].join("\r\n");
   } else {
     const boundary = `----=_Boundary_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    const imageParts = posterImages.flatMap((img, i) => [
+      `--${boundary}`,
+      `Content-Type: ${img.mimeType}`,
+      `Content-Transfer-Encoding: base64`,
+      `Content-ID: <poster${i}>`,
+      `Content-Disposition: inline; filename="${sanitizeFilename(img.filename)}"`,
+      ``,
+      wrapBase64(img.data),
+    ]);
     const parts = [
       `--${boundary}`,
       `Content-Type: text/html; charset=UTF-8`,
       ``,
       html,
-      `--${boundary}`,
-      `Content-Type: ${posterImage.mimeType}`,
-      `Content-Transfer-Encoding: base64`,
-      `Content-ID: <poster>`,
-      `Content-Disposition: inline; filename="${posterImage.filename}"`,
-      ``,
-      posterImage.data,
+      ...imageParts,
       `--${boundary}--`,
     ];
 
@@ -267,11 +291,12 @@ app.delete("/api/accounts/:id", async (req, res) => {
   }
 });
 
-// ── Settings (message template + global poster fallback) ──────────────────
+// ── Settings (message template + global poster fallback list) ─────────────
 app.get("/api/settings", async (req, res) => {
   try {
-    const settings = await settingsDb.getSettings();
-    res.json(settings || { messageTemplate: "", posterLink: "", hasPosterImage: false });
+    const settings = (await settingsDb.getSettings()) || { messageTemplate: "" };
+    const globalPosters = await globalPostersDb.listGlobalPosters();
+    res.json({ ...settings, globalPosters });
   } catch (err) {
     res.status(500).json({ error: "Failed to load settings: " + err.message });
   }
@@ -279,47 +304,74 @@ app.get("/api/settings", async (req, res) => {
 
 app.put("/api/settings", async (req, res) => {
   try {
-    const { messageTemplate, posterLink } = req.body;
-    const cleanLink = (posterLink || "").trim();
-    if (cleanLink && !driveFileIdFromUrl(cleanLink)) {
-      return res.status(400).json({ error: "That doesn't look like a valid Google Drive share link" });
-    }
+    const { messageTemplate } = req.body;
     const cleanTemplate = sanitizeTemplateHtml(messageTemplate || "");
-    await settingsDb.saveSettings({ messageTemplate: cleanTemplate, posterLink: cleanLink });
-    if (cleanLink) await settingsDb.clearPosterImage(); // link and uploaded image are mutually exclusive
+    await settingsDb.saveSettings({ messageTemplate: cleanTemplate });
     res.json({ ok: true, messageTemplate: cleanTemplate });
   } catch (err) {
     res.status(500).json({ error: "Failed to save settings: " + err.message });
   }
 });
 
-app.post("/api/settings/poster-image", imageUpload.single("image"), async (req, res) => {
+app.post("/api/settings/posters/image", imageUpload.single("image"), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: "No image file provided" });
-    await settingsDb.setPosterImage({
+    if ((await globalPostersDb.countGlobalPosters()) >= MAX_GLOBAL_POSTERS) {
+      return res.status(400).json({ error: `You can only have up to ${MAX_GLOBAL_POSTERS} default posters` });
+    }
+    const item = await globalPostersDb.addGlobalPosterImage({
       base64: req.file.buffer.toString("base64"),
       mimeType: req.file.mimetype,
       filename: req.file.originalname,
       size: req.file.size,
     });
-    res.json({ ok: true, posterImageName: req.file.originalname, posterImageMime: req.file.mimetype, posterImageSize: req.file.size });
+    res.status(201).json(item);
   } catch (err) {
     res.status(500).json({ error: "Failed to save poster image: " + err.message });
   }
 });
 
-app.delete("/api/settings/poster-image", async (req, res) => {
+app.post("/api/settings/posters/link", async (req, res) => {
   try {
-    await settingsDb.clearPosterImage();
-    res.json({ ok: true });
+    const link = (req.body.link || "").trim();
+    if (!link || !driveFileIdFromUrl(link)) {
+      return res.status(400).json({ error: "That doesn't look like a valid Google Drive share link" });
+    }
+    if ((await globalPostersDb.countGlobalPosters()) >= MAX_GLOBAL_POSTERS) {
+      return res.status(400).json({ error: `You can only have up to ${MAX_GLOBAL_POSTERS} default posters` });
+    }
+    const item = await globalPostersDb.addGlobalPosterLink(link);
+    res.status(201).json(item);
   } catch (err) {
-    res.status(500).json({ error: "Failed to remove poster image: " + err.message });
+    res.status(500).json({ error: "Failed to save poster link: " + err.message });
   }
 });
 
-app.get("/api/settings/poster-image", async (req, res) => {
+app.put("/api/settings/posters/:id/link", async (req, res) => {
   try {
-    const image = await settingsDb.getPosterImage();
+    const link = (req.body.link || "").trim();
+    if (!link || !driveFileIdFromUrl(link)) {
+      return res.status(400).json({ error: "That doesn't look like a valid Google Drive share link" });
+    }
+    await globalPostersDb.updateGlobalPosterLink(req.params.id, link);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to update poster link: " + err.message });
+  }
+});
+
+app.delete("/api/settings/posters/:id", async (req, res) => {
+  try {
+    await globalPostersDb.removeGlobalPoster(req.params.id);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to remove poster: " + err.message });
+  }
+});
+
+app.get("/api/settings/posters/:id/image", async (req, res) => {
+  try {
+    const image = await globalPostersDb.getGlobalPosterImage(req.params.id);
     if (!image) return res.status(404).end();
     res.setHeader("Content-Type", image.mimeType || "application/octet-stream");
     res.setHeader("Cache-Control", "no-store");
@@ -381,10 +433,28 @@ function canonicalizeHeader(raw) {
   if (/^s\.?\s*no\.?$/.test(clean)) return "sno";
   if (/email/.test(clean)) return "email";
   if (/(institution|school)/.test(clean) && /name/.test(clean)) return "institution";
-  if (/^institution$/.test(clean)) return "institution";
+  if (/^(institution|school|college|university)$/.test(clean)) return "institution";
   if (/name/.test(clean)) return "name";
   return clean.replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
 }
+
+// Any number of numbered attachment/poster columns are supported — a header
+// like "ATTACHMENT LINK 2" already canonicalizes to a distinct key
+// (attachment_link_2) via the generic slug rule above; this just collects
+// all of them off a parsed row, in a stable order, for the send path.
+const LINK_KEY_RE = /^(attachment_link|poster_link)_?(\d+)?$/;
+function collectRowLinks(row, base) {
+  return Object.keys(row)
+    .map((k) => { const m = k.match(LINK_KEY_RE); return m && m[1] === base ? { key: k, n: m[2] ? +m[2] : 0 } : null; })
+    .filter(Boolean)
+    .sort((a, b) => a.n - b.n || a.key.localeCompare(b.key))
+    .map(({ key }) => String(row[key] ?? "").trim())
+    .filter(Boolean)
+    .filter((v, i, arr) => arr.indexOf(v) === i) // dedupe, keep first occurrence
+    .slice(0, MAX_LINKS_PER_ROW);
+}
+const rowAttachmentLinks = (row) => collectRowLinks(row, "attachment_link");
+const rowPosterLinks = (row) => collectRowLinks(row, "poster_link");
 
 // Real spreadsheet exports quote fields containing commas (e.g. institution
 // names like "Maharaja Agrasen College, University of Delhi") — a naive
@@ -427,13 +497,19 @@ app.post("/api/parse-csv", upload.single("csv"), (req, res) => {
     const table = parseCsv(text.trim());
     if (table.length === 0) return res.status(400).json({ error: "CSV appears empty" });
 
-    const headers = table[0].map(canonicalizeHeader);
-    const rows    = table.slice(1).map((vals) => {
+    const rawHeaders = table[0].map(canonicalizeHeader);
+    // Some sheets (e.g. ones focused on multiple attachments) have no
+    // S.No./S. NO column at all — Step 3's range filter needs an sno on
+    // every row, so number them by file order when one isn't present.
+    const hasSno  = rawHeaders.includes("sno");
+    const headers = hasSno ? rawHeaders : ["sno", ...rawHeaders];
+    const rows    = table.slice(1).map((vals, idx) => {
       const obj = {};
-      headers.forEach((h, i) => (obj[h] = (vals[i] || "").trim()));
+      if (!hasSno) obj.sno = String(idx + 1);
+      rawHeaders.forEach((h, i) => (obj[h] = (vals[i] || "").trim()));
       return obj;
     });
-    res.json({ headers, rows, total: rows.length });
+    res.json({ headers, rows, total: rows.length, snoAutoGenerated: !hasSno });
   } catch (err) {
     res.status(400).json({ error: "Failed to parse CSV: " + err.message });
   }
@@ -487,37 +563,45 @@ app.post("/api/send", async (req, res) => {
     ACTIVE_JOBS[jobId] = { aborted: false };
   }
 
-  // Pre-fetch each distinct poster link once (not per-row) — a CSV of 200
-  // rows sharing one poster link would otherwise retry the same failing
-  // download hundreds of times and risk Google rate-limiting the server.
-  const posterImages = new Map();
-  const uniquePosterLinks = [...new Set(rows.map((r) => r.poster_link).filter(Boolean))];
+  // Pre-fetch each distinct poster link once (not per-row) across every
+  // numbered poster_link* column — a CSV of 200 rows sharing one poster
+  // link would otherwise retry the same failing download hundreds of times
+  // and risk Google rate-limiting the server.
+  const posterCache = new Map(); // url -> file | null
+  const uniquePosterLinks = [...new Set(rows.flatMap(rowPosterLinks))].slice(0, 50);
   for (const link of uniquePosterLinks) {
     try {
-      posterImages.set(link, await downloadDriveFile(link, { requireImage: true }));
+      posterCache.set(link, await downloadDriveFile(link, { requireImage: true }));
       res.write(JSON.stringify({ info: `Poster fetched for embedding: ${link}` }) + "\n");
     } catch (err) {
-      posterImages.set(link, null);
+      posterCache.set(link, null);
       res.write(JSON.stringify({ info: `⚠ Could not fetch poster (will send without it): ${err.message}` }) + "\n");
     }
   }
 
-  // Resolve one global poster (used only for rows that don't supply their
-  // own poster_link) — skip entirely if every row already has its own link,
-  // to avoid paying for a Drive fetch nobody needs.
-  let globalPoster = null;
-  if (rows.some((r) => !r.poster_link)) {
-    const storedImage = await settingsDb.getPosterImage();
-    if (storedImage) {
-      globalPoster = { filename: storedImage.filename, mimeType: storedImage.mimeType, data: storedImage.base64 };
-    } else if (settings?.posterLink) {
-      try {
-        globalPoster = await downloadDriveFile(settings.posterLink, { requireImage: true });
-        res.write(JSON.stringify({ info: `Default poster fetched for embedding: ${settings.posterLink}` }) + "\n");
-      } catch (err) {
-        res.write(JSON.stringify({ info: `⚠ Could not fetch default poster (will send without it): ${err.message}` }) + "\n");
+  // Resolve the global fallback poster list (used only for rows that supply
+  // none of their own poster_link* columns) — skip entirely if every row
+  // already has its own, to avoid paying for fetches nobody needs.
+  let globalPosterList = [];
+  if (rows.some((r) => rowPosterLinks(r).length === 0)) {
+    for (const item of await globalPostersDb.getGlobalPosterPayload()) {
+      if (item.kind === "image") {
+        globalPosterList.push({ filename: item.imageName, mimeType: item.imageMime, data: item.imageBase64 });
+      } else if (item.link) {
+        if (!posterCache.has(item.link)) {
+          try {
+            posterCache.set(item.link, await downloadDriveFile(item.link, { requireImage: true }));
+            res.write(JSON.stringify({ info: `Default poster fetched for embedding: ${item.link}` }) + "\n");
+          } catch (err) {
+            posterCache.set(item.link, null);
+            res.write(JSON.stringify({ info: `⚠ Could not fetch default poster (will send without it): ${err.message}` }) + "\n");
+          }
+        }
+        const file = posterCache.get(item.link);
+        if (file) globalPosterList.push(file); // a failed global link is skipped, not fatal
       }
     }
+    globalPosterList = globalPosterList.slice(0, MAX_GLOBAL_POSTERS);
   }
 
   for (let i = 0; i < rows.length; i++) {
@@ -530,15 +614,21 @@ app.post("/api/send", async (req, res) => {
 
     const bodyHtml = fillTemplate(template, row);
 
-    const posterImage = (row.poster_link && posterImages.get(row.poster_link)) || globalPoster || null;
+    // A row that supplies any of its own poster links uses only those —
+    // even if a particular link's fetch failed — never silently falling
+    // back to the global poster (which could be for an unrelated campaign).
+    const rowLinks = rowPosterLinks(row);
+    const postersToSend = rowLinks.length > 0
+      ? rowLinks.map((l) => posterCache.get(l)).filter(Boolean).slice(0, MAX_GLOBAL_POSTERS)
+      : globalPosterList;
 
     const raw = buildRawMessage({
       from:           `"${acc.displayName}" <${acc.email}>`,
       to:             row.email,
       subject:        subject || `Hello from ${acc.displayName}`,
       bodyHtml,
-      attachmentLink: row.attachment_link || "",
-      posterImage,
+      attachmentLinks: rowAttachmentLinks(row),
+      posterImages:    postersToSend,
     });
 
     try {

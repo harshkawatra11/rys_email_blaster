@@ -18,3 +18,20 @@ CREATE TABLE IF NOT EXISTS app_settings (
   created_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+-- Replaces app_settings' old single poster slot with a variable-length list
+-- of fallback poster images/links (used only for CSV rows with none of
+-- their own attachment_link*/poster_link* columns).
+CREATE TABLE IF NOT EXISTS global_posters (
+  id            VARCHAR(64) PRIMARY KEY,
+  kind          VARCHAR(8) NOT NULL,
+  position      INTEGER NOT NULL,
+  link          TEXT,
+  image_base64  LONGTEXT,
+  image_mime    VARCHAR(100),
+  image_name    VARCHAR(255),
+  image_size    INTEGER,
+  created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_global_posters_position (position)
+);

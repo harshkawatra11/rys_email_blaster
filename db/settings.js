@@ -29,23 +29,36 @@ async function getSettings() {
   return toCamel(rows[0]);
 }
 
-async function saveSettings({ messageTemplate, posterLink }) {
+// posterLink/poster image are now managed by db/globalPosters.js (a
+// variable-length list) — this only ever writes message_template.
+async function saveSettings({ messageTemplate }) {
   const sql = isPg
-    ? `INSERT INTO app_settings (id, message_template, poster_link)
-       VALUES (?, ?, ?)
+    ? `INSERT INTO app_settings (id, message_template)
+       VALUES (?, ?)
        ON CONFLICT (id) DO UPDATE SET message_template = EXCLUDED.message_template,
-                                       poster_link = EXCLUDED.poster_link,
                                        updated_at = CURRENT_TIMESTAMP`
-    : `INSERT INTO app_settings (id, message_template, poster_link)
-       VALUES (?, ?, ?)
+    : `INSERT INTO app_settings (id, message_template)
+       VALUES (?, ?)
        ON DUPLICATE KEY UPDATE message_template = VALUES(message_template),
-                                poster_link = VALUES(poster_link),
                                 updated_at = CURRENT_TIMESTAMP`;
-  await query(sql, [SETTINGS_ID, messageTemplate, posterLink || null]);
+  await query(sql, [SETTINGS_ID, messageTemplate]);
 }
 
-// Uploading an image and setting a Drive link are mutually exclusive —
-// uploading clears any stored link so the two sources can't conflict.
+// Clears the legacy single-poster columns once migrateLegacySinglePoster()
+// (db/globalPosters.js) has copied them into the global_posters table.
+async function clearLegacyPoster() {
+  await query(
+    `UPDATE app_settings SET poster_link = NULL, poster_image_base64 = NULL, poster_image_mime = NULL,
+                              poster_image_name = NULL, poster_image_size = NULL,
+                              updated_at = CURRENT_TIMESTAMP
+     WHERE id = ?`,
+    [SETTINGS_ID]
+  );
+}
+
+// @deprecated — kept only so migrateLegacySinglePoster() (db/globalPosters.js)
+// can read/copy any poster that was configured before the single-slot model
+// was replaced by the global_posters list. Do not call these from new code.
 async function setPosterImage({ base64, mimeType, filename, size }) {
   const sql = isPg
     ? `INSERT INTO app_settings (id, poster_link, poster_image_base64, poster_image_mime, poster_image_name, poster_image_size)
@@ -93,13 +106,14 @@ async function getPosterImage() {
 async function seedIfEmpty(defaultHtml) {
   const [rows] = await query("SELECT id FROM app_settings WHERE id = ?", [SETTINGS_ID]);
   if (rows.length > 0) return;
-  await saveSettings({ messageTemplate: defaultHtml || "", posterLink: "" });
+  await saveSettings({ messageTemplate: defaultHtml || "" });
 }
 
 module.exports = {
   SETTINGS_ID,
   getSettings,
   saveSettings,
+  clearLegacyPoster,
   setPosterImage,
   clearPosterImage,
   getPosterImage,

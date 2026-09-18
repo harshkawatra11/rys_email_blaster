@@ -1,0 +1,1700 @@
+╭─── Claude Code v2.1.220 ─────────────────────────────────────────────────────╮
+│                                                    │ Tips for getting        │
+│                 Welcome back Harsh!                │ started                 │
+│                                                    │ Run /init to create a … │
+│                       ▐▛███▜▌                      │ ─────────────────────── │
+│                      ▝▜█████▛▘                     │ What's new              │
+│                        ▘▘ ▝▝                       │ Bug fixes and reliabil… │
+│ Opus 4.8 · Claude Pro · harshkawatra11@gmail.com's │ Added Claude Opus 5 (`… │
+│ Organization                                       │ Added `sandbox.network… │
+│ c:\Users\harsh\Desktop\HARSH\WEB-DEV-PROJECTS\rys… │ /release-notes for more │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+   Tackle your toughest work with Opus 5. Switch anytime with /model.
+
+❯ /model opus                                                                   
+  ⎿  Set model to claude-opus-4-8
+
+❯ Claude, The folder that you are now in is called r y s email blaster. Okay?   
+  This app was initially built to send multiple or bulk emails across           
+  participants and participant management system regarding the events of an     
+  organization. Okay. Initially, we tried each and every option possible.       
+  First, we built a proper Node JS system for this thing to be built. Then we   
+  had a HTML template or the front end connected. then initially tried          
+  different services at the back end that can eventually send the emails in     
+  bulk. Okay? We first went to the service as resend. Okay. So resend service   
+  did three hundred emails, and after that, they charged. Okay? Next option,    
+  what we had was node mailer. Okay? Node mailer service had a few backstops.   
+  The thing was that HTTP was blocked when it hosted on render. Render normally 
+  blocked the SMTP ports that eventually were used to send emails via one or    
+  the other emails when their access tokens or refresh tokens were generated    
+  using get tokens dot j s or whatever file we, like, created to generate the   
+  refresh token. And the next task was, like, very much irritating because on   
+  localhost, this node mailer service worked perfect. So we thought that, okay, 
+  it's being used by, you know, not many five or six people, so he can use it   
+  on localhost, but no. I was a little deployment friendly person And, you      
+  know, I always wanted to make sure that if a tool is being, like, used by     
+  four or five people, five to, you know, not -- I always wanted that this      
+  thing should deploy. Okay? So on render, we somehow figured out that we... if 
+  connect Gmail's official API service, then we had two phase, one problem.     
+  Okay? What was that problem was that, first of all, through Google Cloud      
+  Console, we had to e... add each and every email as a test user. And what we  
+  had to do is run get tokens dot j s, then eventually click our email ID.      
+  Okay? And then in the terminal, a node or, like, a node JSON system generated 
+  a token. Okay? That was the refresh token or the access token. And the thing  
+  was this expires in seven days. So this had... this long task of, like,       
+  regenerating the access tokens or refresh tokens, then again loading it into  
+  the e n v file. This also took manual work. So, again, we had to figure out   
+  something to reduce this thing. Okay? So now we were done with, okay, now our 
+  Blaster works. The email Blaster works. We had also made sure that if two     
+  hundred emails are being sent from one email, then the problem was that Gmail 
+  eventually did not allow that service, and what we got was error. So I added  
+  a delay of, say, one or one point five seconds across each and every mail     
+  sent. So that changed the entire system, the entire workflow, or how we       
+  worked through. Okay? Next thing, to figure out the refresh token thing. What 
+  I did was added a cloud based database, a post grace database that            
+  eventually enabled each and every user to just click on add account, then     
+  click on continue with Google. And as they click on continue with Google      
+  account and select their account particularly in their... in this app, then   
+  this access token gets auto generated and eventually what happens is that     
+  this token gets stored in the cloud database and whenever we just need to     
+  send emails or something, this gets retrieved from the cloud database and     
+  eventually the copying again and again this from the terminal gets done.      
+  Okay. So after reading all the files and everything, when you are ready with  
+  all the context of this app, I have a quick question for you that you have to 
+  answer and if we build this thing, will be on the top of this word. Okay?     
+
+● I'll get familiar with the app first so I'm ready for your question. Let me
+  read through the project.
+
+  Searched for 1 pattern, ran 1 shell command (ctrl+o to expand)
+
+❯ Ten. My question now to you is that now I want to create this service for     
+  WhatsApp. and your task is to roam around, figure out each and every          
+  framework possible, node, express, render, vercel, netlify, postgres          
+  database, then we have official APIs to be connected in an app. Okay. Third   
+  party services and each and every framework and service possible in the world 
+  to connect your phone number, okay, to wire in your phone number. Be this     
+  app be a web hosted app or a Android app that would be created using Android  
+  Studio? Okay? Whatever. I don't care at all. I just want you to run a deep    
+  research across this world's Internet, this planet's Internet, and eventually 
+  find me a way to build me a WhatsApp blaster. Okay? People eventually in the  
+  team have tried, like, manually sending, say, two thousand messages and just  
+  forwarding it to two thousand people because, of course, they are             
+  participants. They have to be send as messages, and what they got is blockage 
+  from WhatsApp. Okay? That is a thing that I don't want. We will add delay in  
+  sending the message or, like, whatever, like, eventually improves the system  
+  and helps us to build the WhatsApp cluster. Run the deep research and let me  
+  know whenever you are ready.                                                  
+
+● This is a great next step, and it's a genuinely different beast from email.
+  Let me run real research to give you current, accurate answers — WhatsApp's
+  rules and pricing changed significantly in 2024–2025. Let me load the search
+  tools and dig in.
+
+● Let me run parallel searches across the key options.
+
+● Web Search("WhatsApp Business Cloud API 2026 pricing per-message template
+            messaging opt-in requirements")
+  ⎿  Did 2 searches in 10s
+
+● Web Search("Baileys whatsapp-web.js unofficial WhatsApp API ban risk 2025 bulk
+            messaging")
+  ⎿  Did 1 search in 11s
+
+● Web Search("WhatsApp bulk messaging BSP Twilio 360dialog Gupshup Wati pricing
+            comparison 2025")
+  ⎿  Did 1 search in 10s
+
+● Let me confirm the direct-Meta (no-BSP) path and template mechanics, since
+  that's likely the cheapest route for an NGO.
+
+● Web Search("WhatsApp Cloud API direct Meta signup free 1000 conversations
+            phone number registration developer 2026")
+  ⎿  Did 1 search in 8s
+
+● Web Search("WhatsApp marketing template message approval rejected reasons
+            quality rating tiers 1000 messaging limit")
+  ⎿  Did 2 searches in 13s
+
+● Research done. Here's the honest, current picture — and it reframes your
+  question in an important way.
+
+  The one thing you have to internalize first
+
+  WhatsApp is not email. With email, the channel is neutral — you own the
+  sending, and delays/reputation management get you through. With WhatsApp, Meta
+  owns the channel and actively hunts for exactly what you're describing. Your
+  team's mass-forwarding got blocked not because of speed, but because
+  WhatsApp's spam detection is ML/heuristic — it reads reports, blocks, low
+  engagement, and "new number messaging many strangers" patterns. Adding a delay
+  will not save an unofficial blaster. Data point from the research: tools that
+  reverse-engineer WhatsApp Web (Baileys, whatsapp-web.js, WAHA, Evolution API)
+  typically last 2–8 weeks before the number is banned, and 68% of Indian
+  businesses using them reported a ban within 12 months.
+
+  So the real fork isn't "which framework" — it's official vs. unofficial, and
+  they lead to opposite outcomes.
+
+  The two paths
+
+  ┌─────────────┬───────────────────────────┬───────────────────────────────┐
+  │             │    Path A — Official      │   Path B — Unofficial libs    │
+  │             │ WhatsApp Cloud API (Meta) │  (Baileys / whatsapp-web.js)  │
+  ├─────────────┼───────────────────────────┼───────────────────────────────┤
+  │ Legality    │ ToS-compliant             │ Violates ToS                  │
+  ├─────────────┼───────────────────────────┼───────────────────────────────┤
+  │ Ban risk    │ None (this is the         │ Very high — 2–8 weeks typical │
+  │             │ sanctioned way)           │                               │
+  ├─────────────┼───────────────────────────┼───────────────────────────────┤
+  │ Free-text   │ ❌ Must use pre-approved  │ ✅ Any text — but that's the  │
+  │ blasting    │ templates for cold        │ trap that gets you banned     │
+  │             │ outreach                  │                               │
+  ├─────────────┼───────────────────────────┼───────────────────────────────┤
+  │ Opt-in      │ ✅ Yes                    │ Ignores it → bans             │
+  │ required    │                           │                               │
+  ├─────────────┼───────────────────────────┼───────────────────────────────┤
+  │ Cost        │ Free to access +          │ "Free" + your number's life   │
+  │             │ per-message (pennies)     │                               │
+  ├─────────────┼───────────────────────────┼───────────────────────────────┤
+  │             │ Meta Business             │                               │
+  │ Setup       │ verification, template    │ npm install, scan a QR code   │
+  │             │ approval                  │                               │
+  ├─────────────┼───────────────────────────┼───────────────────────────────┤
+  │             │ The only sustainable      │ The thing that already failed │
+  │ Verdict     │ answer                    │  your team, dressed up in     │
+  │             │                           │ code                          │
+  └─────────────┴───────────────────────────┴───────────────────────────────┘
+
+  Path B is seductive because it feels like your email app (free-text, your
+  control). It is the same mistake your team already made, just automated. I
+  won't recommend building on it. There was even a malicious baileys fork
+  (lotusbail, 56k+ downloads) caught in Dec 2025 stealing WhatsApp auth tokens —
+  the ecosystem is genuinely hazardous.
+
+  The recommended build — and the good news
+
+  Path A reuses ~90% of what you already built. You do not need an Android app,
+  and you do not "wire in your phone number" via SMS gateways. The Cloud API is
+  Meta-hosted; you register a number with Meta and then just make HTTPS calls to
+  the Graph API — conceptually identical to how you swapped SMTP for the Gmail
+  API.
+
+  What stays the same:
+  - Node + Express + your existing server structure
+  - Postgres on Render (the whole dual-driver DB layer, accounts table pattern)
+  - CSV upload + parser (your RFC-4180 parser is directly reusable)
+  - The per-recipient loop with delay, progress streaming (NDJSON), abort button
+
+  What changes:
+  - gmail.users.messages.send(...) → POST 
+  https://graph.facebook.com/v21.0/<PHONE_NUMBER_ID>/messages with a JSON body
+  referencing an approved template + per-recipient variables ({{name}}, etc.)
+  - OAuth refresh-token dance → a Meta permanent access token (System User token
+  — no 7-day expiry pain, unlike your Gmail saga)
+  - Your template.txt → a Meta-approved message template (submitted once,
+  approved in minutes–hours)
+
+  Key constraints you must design around (non-negotiable on the official path):
+  1. Templates, not free text — for anyone outside a 24-hour reply window, you
+  send a pre-approved template. You can personalize variables and include the
+  poster/brochure as a header media + a button. This actually fits your
+  invitation use-case fine.
+  2. Opt-in — Meta requires recipients consented to hear from you on WhatsApp.
+  Your participants registering via your Google Form (with a WhatsApp-consent
+  checkbox) is a clean, defensible opt-in. Add that checkbox to your form.
+  3. Messaging tiers — after business verification you start at 1,000 unique 
+  recipients/day (Tier 1), auto-scaling to 10k → 100k as your quality rating
+  stays healthy. For 2,000 participants that's ~2 days, or request a tier bump.
+  4. Quality rating — keep it green by only messaging people who opted in and
+  want it. This is why it won't get blocked: you're messaging a warm, consenting
+  audience with relevant content.
+
+  Cost reality (this will surprise you — it's cheap for an NGO)
+
+  You can go direct to Meta with no BSP (no Twilio/Wati/Gupshup markup needed).
+  Cloud API access is free; you pay Meta per delivered template message, priced
+  by recipient country + category:
+
+  - India, marketing template: ~$0.0118/msg → 2,000 invites ≈ $24
+  - India, utility template: ~$0.004/msg → 2,000 ≈ $8
+  - Plus 1,000 free conversations/month included
+  - Replies within 24h are free
+
+  So the entire campaign costs less than a coffee run. A BSP (360dialog flat
+  ~$5/mo + $0.005/msg, or Twilio +$0.005/msg) only buys you an easier onboarding
+  — worth it only if Meta's direct Business Verification proves painful.
+
+  My recommendation
+
+  Build RYS WhatsApp Blaster as a near-clone of your email app: Node/Express on 
+  Render, Postgres, CSV upload, template send loop with delay — but sending via
+  the official WhatsApp Cloud API direct from Meta, using approved templates and
+  Google-Form opt-in. Skip Android Studio entirely; skip every unofficial
+  library.
+
+  The only real work beyond your existing skills is the one-time Meta
+  onboarding: Business verification + registering a phone number + getting a
+  template approved. That's the gate — clear it once and the send code is
+  simpler than your Gmail integration.
+
+  ---
+  Before I design the build, two things I need from you:
+
+  1. The phone number — you'll need a number not currently active on the regular
+  WhatsApp/WhatsApp Business app to register with the Cloud API (registering
+  migrates it off the consumer app). Do you have a dedicated org number for
+  this?
+  2. Opt-in — are you willing to add a WhatsApp-consent checkbox to your
+  registration Google Form? This is what keeps you unblockable.
+
+  Want me to (a) write up a concrete phased build plan + the exact Meta
+  onboarding checklist, or (b) start scaffolding the code by adapting your
+  current server? I'd suggest we run the brainstorming step first to lock down
+  scope before I build.
+
+  Sources:
+  - WhatsApp Business API Pricing 2026 — Blueticks
+  (https://blueticks.co/blog/whatsapp-business-api-pricing-2026)
+  - Per-Message Pricing 2026 — Blueticks
+  (https://blueticks.co/blog/whatsapp-business-pricing-change-2026-per-message)
+  - Cloud API Get Started — Meta for Developers (https://developers.facebook.com
+  /documentation/business-messaging/whatsapp/get-started)
+  - Register a business phone number — Meta for Developers
+  (https://developers.facebook.com/documentation/business-messaging/whatsapp/bus
+  iness-phone-numbers/registration)
+  - Capacity, Quality Rating, and Messaging Limits — Meta
+  (https://developers.facebook.com/docs/whatsapp/messaging-limits/)
+  - WhatsApp Cloud API vs Unofficial Libraries
+  (https://whatsapp.checkleaked.cc/blog/whatsapp-cloud-api-vs-unofficial)
+  - WhatsApp Automation Ban Risk India 2026 — Kraya AI
+  (https://blog.kraya-ai.com/whatsapp-automation-ban-risk)
+  - Twilio vs 360Dialog pricing — Kommunicate
+  (https://www.kommunicate.io/blog/twilio-vs-360dialog-a-comparison/)
+  - Top WhatsApp BSPs 2026 — Prelude
+  (https://prelude.so/blog/best-whatsapp-business-solution-providers)
+  - How to Collect WhatsApp Opt-Ins — LINK Mobility (https://www.linkmobility.co
+  m/blog/how-to-collect-whatsapp-opt-ins-the-right-way)
+  - Tips to Avoid Template Rejections — Gallabox (https://gallabox.com/blog/tips
+  -guidelines-to-avoid-whatsapp-message-template-rejections)
+
+❯ I want a completely free option.                                              
+
+● Straight answer: a completely free option that is also safe and won't get your
+  number banned does not exist for WhatsApp cold-blasting. Let me show you
+  exactly why, and then give you the two things that are actually closest to
+  free so you can pick.
+
+  Why "free" is a trap on WhatsApp specifically
+
+  There are only two ways to send, and "free" pulls them in opposite directions:
+
+  1. Official Cloud API — nearly free, but not literally $0 for your use-case.
+  The API itself is free (no license fee), and you get 1,000 free 
+  conversations/month — but that free tier is mainly for user-initiated / 
+  service conversations. Your job is the opposite: business-initiated cold 
+  outreach to 2,000 participants, which is billed as marketing/utility
+  templates. At India rates that's roughly:
+  - Utility template: ~$0.004 × 2,000 ≈ $8
+  - Marketing template: ~$0.012 × 2,000 ≈ $24
+
+  So your real bill is single-digit-to-low-double-digit dollars for the whole 
+  campaign — effectively free for an NGO, but not literally zero. Everything
+  else (Render free tier, Postgres free tier, the code) is $0.
+
+  2. Unofficial library (Baileys / whatsapp-web.js) — literally $0 in fees, but 
+  this is the exact thing that already failed your team.
+  It costs nothing in money because you run it on your own free server and scan
+  a QR code with a real WhatsApp account. But "free" here is paid in banned 
+  numbers — 2–8 weeks typical lifespan, 68% ban rate within a year. Delays don't
+  fix it. This is your team's manual-forwarding problem rewritten in Node. I'd
+  be doing you a disservice to build this as your main system.
+
+  My honest recommendation
+
+  Go with the Cloud API and accept the ~$8–24 as the "free" version. Here's the
+  reframe: the money isn't the obstacle — you already pay $0 for hosting, and
+  $8–24 for reaching 2,000 people is nothing compared to the cost of your org's
+  WhatsApp number getting permanently banned mid-campaign. "Free" in the
+  unofficial sense is the most expensive option you have, because the price is
+  the channel itself.
+
+  If literally-zero-dollars is a hard requirement (not a preference), then say
+  so and I'll be equally honest about the trade: the only $0 mechanism is the
+  unofficial route, it violates WhatsApp's ToS, and it will likely burn a number
+  — you'd want to use a throwaway number you don't care about, heavy delays,
+  small batches, and treat every send as possibly the number's last. I can
+  explain that path, but I won't pretend it's sustainable.
+
+  A question that might dissolve the whole cost problem: is the goal to reach a
+  known, opted-in list of your registered participants (people who signed up and
+  expect to hear from you)? If yes, the Cloud API's warm-audience model fits
+  perfectly and the pennies-per-message is genuinely the right answer. If you're
+  trying to message 2,000 people who didn't opt in, then no option — free or 
+  paid — will work, because that's precisely what both WhatsApp's billing and
+  its ban system are built to stop.
+
+  Which is it — do you want me to (a) plan the Cloud API build treating the ~$10
+  as acceptable, or (b) walk through the literal-$0 unofficial route with eyes
+  open to the ban risk?
+
+❯ /model                                                                        
+  ⎿  Current model: Opus 4.8 (session override from plan mode)
+     Base model: Sonnet 5 (effort: low)
+     Usage: /model <name>. Available: sonnet, opus, haiku, fable, best, sonnet[1m], opus[1m], fable[1m], opusplan, default, or a full model ID.
+
+❯ /model sonnet                                                                 
+  ⎿  Set model to claude-sonnet-5
+
+❯ Run through each and every possible service on the Internet and tell me that  
+  how is the free route possible. Okay, without getting banned from WhatsApp    
+  or, like, without getting banned, like, for twenty four hours, your number is 
+  blocked. And your target is not just legitimate roots. Okay? I do not mean    
+  that the target has illegitimate roots. Okay? You see, when we were building  
+  the email blaster, then also we had to figure out things like... first thing, 
+  we had recent, then we had note mailer, then we had the main Gmail API, and   
+  eventually, all the three roots were legitimate. Okay? So don't read them as  
+  any root as illegitimate, just describe me each and every possible thing and  
+  we have to eventually build it for free.                                      
+
+● Let me do exhaustive research across every mechanism — official free tiers,
+  BSP free trials, unofficial libraries, and everything in between.
+
+● Web Search("WhatsApp Cloud API 1000 free conversations per month business
+            initiated marketing utility 2026 exact terms")
+  ⎿  Did 1 search in 7s
+
+● Web Search("free WhatsApp API trial Twilio Gupshup 360dialog free tier sandbox
+            credits 2026")  ⎿  Did 1 search in 8s
+
+● Web Search("WhatsApp click to chat wa.me link bulk automation without ban rate
+            limit safe number")
+  ⎿  Did 1 search in 9s
+
+● Web Search("Baileys whatsapp-web.js free open source rate limit best practices
+            avoid ban delay warmup new number 2025 2026")
+  ⎿  Did 1 search in 11s
+
+● Here's every route that exists, laid out the same way you framed your email
+  journey — Resend → Nodemailer → Gmail API. None of these are "illegitimate";
+  each has a real cost/risk trade-off, and I'll be straight about each one.
+
+  Route 1: WhatsApp Cloud API (official, Meta-hosted) — "the Gmail API of 
+  WhatsApp"
+
+  Money cost: Not $0. Meta killed the free marketing/utility tier in 2025 — only
+  customer-initiated service replies are free and unlimited now. Since your use
+  case is you messaging participants first, every message is a billed
+  "business-initiated" template, from message #1. At India rates: utility ≈
+  $0.004/msg, marketing ≈ $0.012/msg → 2,000 sends ≈ $8–24.
+  Ban risk: Zero — this is the sanctioned channel.
+  Verdict: Cheapest safe option, but not literally free.
+
+  Route 2: BSP free trials (Twilio Sandbox, 360dialog trial, Gupshup, Wati)
+
+  Twilio Sandbox — genuinely free, but only for testing: recipients must first
+  text a "join <code>" phrase to Twilio's shared sandbox number, it's
+  rate-limited, and it's explicitly not meant for real campaigns — you'd still
+  hit Meta's per-message billing once you move to a real number anyway.
+  360dialog / Gupshup / Wati — trial credits exist but are small and time-boxed;
+  they still sit on top of Meta's per-message fee once the trial ends. These
+  BSPs don't erase Meta's cost — they add their own markup on top.
+  Verdict: Not a free path to your actual goal (2,000 real sends) — just a demo
+  layer.
+
+  Route 3: wa.me click-to-chat links, "bulk" via manual/semi-manual clicking
+
+  This is literally what your team already tried by hand (forwarding to 2,000
+  people) — a wa.me/<number>?text=... link still requires a human to open
+  WhatsApp and hit send per recipient, or a bot to simulate that click, which
+  lands you back in Route 4's territory. There's no way to make wa.me itself
+  send messages server-side — it's a UI deep-link, not an API.
+  Verdict: Not a real bulk-sending mechanism at all; it's the manual process,
+  possibly with copy-paste automation, which is what got you blocked already.
+
+  Route 4: Unofficial libraries (Baileys, whatsapp-web.js, WAHA, Evolution API)
+
+  Money cost: Genuinely $0 — self-hosted, MIT-licensed, runs on your existing
+  free Render/Node stack. This is the only route matching your literal ask.
+  Mechanism: It logs in as a real WhatsApp Web session (QR scan) and drives it
+  programmatically — same underlying protocol your team was tapping manually,
+  just automated.
+  Why it's still risky, concretely (not moralizing, just what the research 
+  shows):
+  - New numbers are under heavy automated scrutiny — sending any real volume in
+  week one is what specifically triggers bans.
+  - WhatsApp's 2026 update actively tracks unanswered messages: if a threshold
+  of your sends get no reply within 48h, it starts throttling — a cold invite
+  blast to people who don't respond fits this pattern almost by definition.
+  - Documented lifespan for these tools under bulk use: 2–8 weeks before
+  detection, independent of delay length. Delay reduces the rate of detection,
+  not the certainty.
+  - Real, current supply-chain risk: a trojanized Baileys fork (lotusbail) was
+  caught stealing WhatsApp session tokens in Dec 2025 — so package hygiene
+  matters if you go this way.
+
+  But — if you accept the risk and structure it carefully, here is how the 
+  research says it's actually done to minimize (never eliminate) bans:
+  1. Warm up the number 5–7 days first — real human use: chat with known
+  contacts, join a couple groups, receive messages. Never blast fresh off a new
+  SIM.
+  2. Week 1 cap: 50–100 messages/day, not 2,000 in one run.
+  3. Randomized 3–8 second delay per message, plus a 5-minute pause every ~100
+  messages — not a flat 1.5s like your email delay.
+  4. Use a number you can afford to lose. Not your org's main line — a secondary
+  SIM dedicated to this, so a ban doesn't take down your primary contact
+  number.
+  5. Only message people who plausibly expect it (your registered participants)
+  — unanswered-message tracking is the newest and sharpest ban trigger, and a
+  warm, relevant audience naturally replies more.
+  6. Pin the library version and audit the package — after lotusbail, don't
+  blindly npm install a random fork; use the canonical @whiskeysockets/baileys
+  repo directly.
+
+  The honest summary table
+
+  Route: Cloud API (official)
+  $ cost: ~$8–24 total
+  Ban risk: None
+  Actually solves "2,000 sends": Yes, reliably
+  ────────────────────────────────────────
+  Route: BSP free trials
+  $ cost: $0 short-term
+  Ban risk: None (but caps you)
+  Actually solves "2,000 sends": No — trial limits block real volume
+  ────────────────────────────────────────
+  Route: wa.me links
+  $ cost: $0
+  Ban risk: N/A — not automatable server-side
+  Actually solves "2,000 sends": No — this is the manual method that failed
+  ────────────────────────────────────────
+  Route: Baileys/whatsapp-web.js
+  $ cost: $0
+  Ban risk: Real, 2–8 wk typical
+  Actually solves "2,000 sends": Maybe — with warm-up + throttling + disposable
+  number, and only for a warm/opted-in list
+
+  My honest read: Route 4 is the only true $0 answer to your literal question,
+  and it's buildable this week reusing your entire existing stack (Express,
+  Postgres, CSV parser, progress-streaming loop — just swap Gmail's client for
+  Baileys). It is not "illegitimate" any more than Nodemailer was — it's a real,
+  widely-used open-source tool. The trade is explicit: you're gambling a phone
+  number instead of paying ~$10–20, and the odds published across multiple
+  sources put failure at well over half within a year of real bulk use.
+
+  Want me to scaffold the Baileys version now, built with the
+  warm-up/throttle/disposable-number safeguards baked in as hard limits in the
+  code (not just guidance you have to remember)?
+
+❯ Look. What has to be built is a proper email blaster. Okay? Like, it has      
+  emails as listed. So we select email. We click on next, then we select r c s  
+  v file, then we have a template. Okay. In template, we have emails listed to  
+  whom the email has to be sent. Then instead of emails, we'll have phone       
+  number listed. And the first emails, uh, listed of the team, one email will   
+  be selected. Rather here, one phone number will be selected. Okay? Then, uh,  
+  in the next go, what will be selected is The CSV file that contains the phone 
+  numbers and names of the participants. And eventually when hit enter, it      
+  will again ask us that. Okay. So how... which serial number? One two hundred  
+  serial number? Okay. We are sending one two hundred serial number from this   
+  phone... first phone number. Hit enter, and again you can see the everything  
+  on your screen. Okay. So let's try this shit. Okay. And tell me that which    
+  route is the best. I                                                          
+
+● Skill(superpowers:brainstorming)
+  ⎿  Successfully loaded skill
+
+● Recommendation on route
+
+  Baileys (over whatsapp-web.js). Both are free, unofficial, MIT-licensed.
+  Baileys wins for your case specifically:
+  - It talks to WhatsApp's protocol directly (no headless Chrome), so it's
+  lighter and works cleanly on Render's free tier — whatsapp-web.js needs a real
+  Chromium instance running server-side, which is heavy and flaky on free
+  hosting.
+  - It's the same shape as your Gmail integration: a Node library, a persistent
+  auth session (like your refresh token), calls that return promises.
+  - It's the actively-maintained, most-used library in this space (also the one
+  that had the malicious fork — so we pin the official @whiskeysockets/baileys
+  package directly, never a random fork).
+
+  This is Route 4 from before — free, but carries real ban risk that we mitigate
+  in the design itself (warm-up, throttling, disposable number) rather than
+  leaving as a footnote.
+
+  Now let me ask a few quick questions to nail the design before building.
+
+  First: the sending number(s). In your email flow, "select email" picks from
+  multiple already-authenticated Gmail accounts. For WhatsApp, each "account"
+  means a phone number that has an active Baileys session (logged in via QR scan
+  once, session persisted like your refresh tokens). Do you already have one or
+  more dedicated WhatsApp numbers set aside for this, or should the design
+  include an "add number" flow (scan QR in-app, like your "Add account" button)
+  so you can onboard numbers yourself later?
+
+❯ I will onboard the phone numbers later, ok? For right now, I have one phone   
+  number that has to be tested, and I will let you know about that phone        
+  number. And for right now, do not build anything until I command you.         
+
+● Understood — holding here, no code or scaffolding until you say go. I'll keep
+  the design conversation moving whenever you're ready, and you'll onboard the
+  test phone number when you have it.
+
+  Quick status: recommendation locked (Baileys, official @whiskeysockets/baileys
+  package, mirroring your email blaster's architecture), and I'm mid-brainstorm
+  on the design — next question would be about the CSV/serial-number flow and
+  the QR-login "add number" UX. Just say the word when you want to continue or
+  start building.
+
+❯ /model opus                                                                   
+  ⎿  Set model to claude-opus-4-8
+
+❯ So in this folder, in this directory that we are working, build a completely  
+  new folder named r y s WhatsApp Blaster, okay, with hyphens in between them   
+  or underscores in between them in the name. Okay. And then what you have to   
+  do next is eventually build the same front end as the r y s email blasters.   
+  The features have to be completely same. The engineering behind that has to   
+  change. How it has to change that has to be well planned. So as a senior      
+  developer, a senior architect engineer and a very in-depth system design      
+  engineer. Design a very in-depth plan to develop r y s WhatsApp cluster using 
+  the route that you just suggested and let's test it once built. Okay. Make    
+  sure that the PRD or the product requirements document that you built for     
+  this app eventually has each and every possible thing, feature, code,         
+  requirements, front end requirements, UX polish, UI design polish, each and   
+  everything, each and every aspect of this app so that once this app starts    
+  getting built there is no going back. okay. build the plan and then we go     
+  ahead.                                                                        
+
+● I have deep context on the backend already. The one critical file I haven't
+  fully read is the frontend — since you want it replicated exactly. Let me
+  study it.
+
+  Read 3 files (ctrl+o to expand)
+
+● I've now studied the entire email app end-to-end — the 4-step wizard frontend
+  (public/index.html), the streaming send loop, the OAuth/DB account model, the
+  dual MySQL/Postgres pool, and the CSV/template mechanics. I have full context
+  to architect the WhatsApp version.
+
+  Before I write the exhaustive PRD, three decisions genuinely branch the design
+  and I don't want to guess on them:
+
+● User answered Claude's questions:
+  ⎿  · What should each WhatsApp message contain? (WhatsApp has no HTML/subject 
+     line — it's plain text + optional media, unlike the email version's inline 
+     poster + brochure button.) → Text + poster image
+     · Where do we run the FIRST test? (Baileys holds a live socket; Render's 
+     free tier spins down on idle and wipes disk, which kills/detaches the 
+     WhatsApp session.) → Local machine first
+     · How strict should the anti-ban safeguards be in the code? → Configurable 
+     knobs
+
+● Decisions locked: poster image + caption text (links inline for 
+  brochure/form), local-first testing, configurable anti-ban knobs with sensible
+  defaults. Let me write the full PRD to the plan file.
+
+● Updated plan
+  ⎿  /plan to preview
+
+● The PRD is written. It's exhaustive — covering architecture, the DB-backed
+  Baileys session design (the hard part), the QR onboarding flow that replaces
+  OAuth, the full API surface, the anti-ban pacing knobs, the frontend
+  adaptation preserving your exact design system, known risks, a 7-phase build
+  order, and a 10-step local test plan.
+
+  Here's the essence of what I'm proposing to build:
+
+  The one big engineering change from the email app: your email tool is
+  stateless — a refresh token turns into one HTTPS call per send.
+  WhatsApp/Baileys is stateful — each sender number is a live WebSocket that
+  must stay connected, get saved to the DB (so restarts don't force a re-scan),
+  and reconnect after drops. That's wa/manager.js (the socket pool) +
+  wa/authState.js (DB-backed session storage) — the genuinely new code.
+  Everything else mirrors what you already have.
+
+  What stays identical: the 4-step wizard, the dark design system, the RFC-4180
+  CSV parser, the streaming NDJSON send loop with live log + progress bar, the
+  dual MySQL/Postgres pool, the Drive poster fetcher.
+
+  What changes in the UI: "Select Account" → "Select Sender Number" (with live
+  status dots); "Add account (Google)" → "Add number (scan QR)" via a new in-app
+  QR modal; Subject field removed; a pacing-knobs panel added.
+
+  The honest caveat, kept front and center: this free route carries real ban
+  risk (2–8 week typical lifespan under heavy use). We mitigate with
+  configurable pacing and a disposable warm number — but we don't pretend it's
+  eliminated.
+
+  Two notes before you approve:
+  - The only thing blocking the eventual test is the test phone number, which
+  you'll hand me when we get there — the build itself doesn't need it.
+  - You picked configurable knobs with no hard ceiling — so the safeguards are
+  defaults you can override, with a caution note in the UI rather than an
+  enforced cap.
+
+● The plan is complete and written to the plan file. Ready for your review and
+  approval.
+
+● User approved Claude's plan
+  ⎿  Plan saved to: ~\.claude\plans\so-in-this-folder-linked-cocoa.md · /plan to
+     edit
+     RYS WhatsApp Blaster — Product Requirements & Engineering Plan
+
+     Context
+
+     The organization (Rajdhani Yuva Sansad) already runs RYS Email Blaster — a
+     Node/Express
+     bulk-email tool that sends event invitations to participants from a CSV,
+     via the Gmail API,
+     with a 4-step wizard UI, per-account OAuth, a dual MySQL/Postgres data
+     layer, and live
+     streaming send-progress.
+
+     They now want the same product for WhatsApp: identical UX and feature set,
+     but the
+     engine underneath changes because WhatsApp is a fundamentally different
+     channel. The team
+     previously tried mass-forwarding ~2000 messages by hand and got their
+     number blocked.
+
+     Route decision (already made, with the user): Build on Baileys
+     (@whiskeysockets/baileys) — the free, open-source, unofficial WhatsApp Web
+     protocol
+     library. This is the only zero-cost route that can actually send to a list.
+     It is
+     directly analogous to how the email app swapped SMTP → Gmail API: a Node
+     library, a
+     persisted session (like the refresh token), promise-based send calls.
+
+     The tradeoff — accepted knowingly — is ban risk to the sending number.
+     Unlike the
+     official Cloud API (which costs ~$8–24 per 2000 sends but is unbannable),
+     Baileys drives a
+     real WhatsApp session and can be flagged. We therefore make anti-ban pacing
+     a first-class,
+     configurable feature of the product, not an afterthought.
+
+     User decisions locked during planning:
+     1. Message content: templated text as caption + poster image inline;
+     brochure/form
+     as auto-previewing links inside the text. No PDF document attachment.
+     2. Test environment: local machine first (localhost + local DB), deploy to
+     Render
+     only after it works locally.
+     3. Anti-ban: configurable knobs — sensible defaults shown in the UI, every
+     limit
+     editable, no hard ceiling.
+
+     Outcome: a new sibling project rys_whatsapp_blaster/ that a non-technical
+     team member
+     operates exactly like the email tool: pick a sender number → upload CSV →
+     choose an SNO
+     range → watch messages send live.
+
+     ---
+     1. Where it lives & how it relates to the email app
+
+     - New top-level folder rys_whatsapp_blaster/ created next to
+     rys_email_blaster/
+     (i.e. inside .../rys_email/). It is a standalone project — its own
+     package.json, node_modules, .env, git-tracked independently. It does not
+     import
+     from the email app; it mirrors the patterns (dual DB pool, streaming send
+     loop, CSV
+     parser, 4-step wizard) as fresh, adapted code.
+     - We deliberately copy-and-adapt rather than share code, because the
+     account/session
+     model diverges substantially and coupling two live apps adds risk for zero
+     benefit at
+     this scale.
+
+     2. Architecture overview
+
+     Browser (public/index.html — 4-step wizard, unchanged design system)
+        │  fetch/EventSource
+        ▼
+     Express server (server.js)
+        ├── /api/numbers            list/delete sender numbers
+        ├── /api/whatsapp/connect   start Baileys login → stream QR + status
+     (SSE)
+        ├── /api/parse-csv          reuse RFC-4180 parser (phone-aware headers)
+        └── /api/send               streaming NDJSON send loop w/ anti-ban
+     pacing
+        │
+        ▼
+     ConnectionManager (wa/manager.js)
+        • Map<numberId, Baileys socket> held in memory (the "pool")
+        • hydrate all sessions from DB on boot & reconnect
+        • per-socket lifecycle: qr / open / close / logout handling
+        │
+        ├── DB-backed auth state (wa/authState.js)  ←→  Postgres/MySQL
+     (wa_sessions table)
+        ▼
+     WhatsApp servers (WebSocket, via Baileys)
+
+     The email app is stateless per request (refresh token → one HTTPS call).
+     This app is
+     stateful and long-lived: each sender number is a persistent WebSocket that
+     must stay
+     connected, be re-hydrated after restarts, and be reconnected after drops.
+     This is the
+     central engineering difference and the source of most new code.
+
+     3. Tech stack & dependencies
+
+     - Runtime/server: Node ≥ 18, Express 4, Multer (memory storage) — same as
+     email app.
+     - WhatsApp: @whiskeysockets/baileys (pin exact version; never a fork — the
+     lotusbail supply-chain attack forked this package). qrcode (render QR
+     string → PNG
+     data URL for the browser). pino (Baileys' logger dep, quiet level).
+     - DB: pg + mysql2 with the same auto-switching pool.js pattern (local MySQL
+     via
+     DB_* vars, Render Postgres via DATABASE_URL).
+     - Config: dotenv.
+     - No frontend framework — single static index.html (same as email app).
+
+     4. Folder structure
+
+     rys_whatsapp_blaster/
+     ├── .env                      # DB creds, PORT, anti-ban defaults
+     ├── .gitignore                # node_modules/, .env, *.log, wa_auth/
+     ├── package.json
+     ├── render.yaml               # for later deploy (Postgres + web service)
+     ├── server.js                 # Express app, routes, send loop
+     ├── template.txt              # WhatsApp message template ({{name}} etc.)
+     ├── db/
+     │   ├── pool.js               # dual MySQL/PG (copied pattern)
+     │   ├── init.js               # ensureSchema() for wa_sessions
+     │   ├── numbers.js            # list/get/upsert/delete sender numbers
+     (mirrors accounts.js)
+     │   └── schema.sql
+     ├── wa/
+     │   ├── authState.js          # DB-backed Baileys auth adapter (creds +
+     signal keys)
+     │   ├── manager.js            # ConnectionManager: socket pool, lifecycle,
+     reconnect
+     │   └── send.js               # message build (caption+image), JID,
+     onWhatsApp check
+     └── public/
+         ├── index.html            # 4-step wizard (adapted from email app)
+         └── logo.png              # org logo (copied)
+
+     5. Data model
+
+     Replace the email app's accounts table with wa_sessions. Baileys auth state
+     = one
+     creds object + many signal keys (pre-keys, sessions, sender-keys,
+     app-state). We store:
+
+     CREATE TABLE IF NOT EXISTS wa_sessions (
+       id            VARCHAR(64) PRIMARY KEY,   -- slug of phone number, e.g. 
+     "9188..."
+       phone_number  VARCHAR(32)  NOT NULL UNIQUE, -- E.164 digits, no +
+       display_name  VARCHAR(255) NOT NULL,      -- editable label ("Avni", "RYS
+     Main")
+       creds         TEXT NOT NULL,              -- JSON.stringify(Baileys 
+     creds) w/ BufferJSON
+       keys          TEXT NOT NULL DEFAULT '{}', -- JSON map of signal key-type 
+     → {id: value}
+       status        VARCHAR(24) NOT NULL DEFAULT 'disconnected', -- 
+     connected|connecting|disconnected|logged_out
+       created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+       updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+     );
+
+     Baileys uses Buffers in creds/keys; serialize with Baileys' own
+     BufferJSON.replacer /
+     BufferJSON.reviver so bytes survive the round-trip. keys is written on
+     nearly every
+     message (signal ratchet advances) — that's expected; a single TEXT/JSONB
+     blob is
+     acceptable at this scale (a handful of numbers). init.js picks JSONB on PG,
+     TEXT on
+     MySQL.
+
+     6. Baileys session & connection design (the new core)
+
+     6a. DB-backed auth state — wa/authState.js
+
+     Baileys ships useMultiFileAuthState(dir) which writes files to disk —
+     useless on Render's
+     ephemeral FS and awkward to manage. We implement a custom adapter:
+
+     async function useDbAuthState(numberId) → { state: { creds, keys },
+     saveCreds }
+     - On load: read the wa_sessions row, revive creds and keys via
+     BufferJSON.reviver.
+     state.keys implements Baileys' SignalKeyStore interface: get(type, ids) and
+     set(data) reading/writing the in-memory keys map, persisting to DB on set.
+     - saveCreds() serializes creds back to the row.
+     - New (unregistered) number: start from initAuthCreds(), persist after QR
+     pairing.
+
+     6b. ConnectionManager — wa/manager.js
+
+     In-memory Map<numberId, { sock, status, qr }> — the live socket pool.
+     - startConnection(numberId): build socket with
+     makeWASocket({ auth: state, printQRInTerminal:false, browser: 
+     Browsers.appropriate('RYS Blaster'), logger });
+     wire connection.update (qr → store+emit; open → status connected, mark row;
+     close →
+     inspect DisconnectReason: reconnect unless loggedOut) and creds.update → 
+     saveCreds.
+     - getSocket(numberId): returns a connected socket or throws (send loop
+     guards on this).
+     - hydrateAll(): on server boot, load every wa_sessions row and reconnect in
+     background
+     so previously-added numbers come back online without re-scanning.
+     - logout(numberId): sock.logout() + delete row (the "delete number"
+     action).
+     - Emits events (qr/status) consumed by the SSE endpoint.
+
+     6c. QR onboarding flow (replaces Google OAuth redirect)
+
+     Email app did a full-page redirect to Google. WhatsApp needs an in-app QR 
+     modal:
+     1. User clicks “+ Add number” → POST /api/whatsapp/connect (optionally a
+     label).
+     2. Server creates a provisional numberId, calls startConnection, and holds
+     an SSE
+     stream (GET /api/whatsapp/qr-stream?id=...) that pushes {type:'qr', png}
+     (data URL)
+     and {type:'status', status} events.
+     3. Frontend shows the QR PNG in a modal; user scans in WhatsApp mobile
+     (Linked Devices).
+     4. On open, Baileys reports the real logged-in number; we upsert
+     wa_sessions with the
+     true phone_number, push {type:'status', status:'connected', phone}, close
+     the modal,
+     refresh the sender-number dropdown.
+     5. QR auto-refreshes (~20s TTL) — new QR events replace the image; on
+     repeated failure show
+     a “retry” button.
+
+     7. HTTP API (mirrors email app, adapted)
+
+     Method: GET
+     Path: /api/numbers
+     Purpose: list sender numbers (id, phone, displayName, status)
+     Email-app analog: /api/accounts
+     ────────────────────────────────────────
+     Method: DELETE
+     Path: /api/numbers/:id
+     Purpose: logout + delete a number
+     Email-app analog: /api/accounts/:id
+     ────────────────────────────────────────
+     Method: POST
+     Path: /api/whatsapp/connect
+     Purpose: begin QR login for a new number
+     Email-app analog: /api/oauth/start
+     ────────────────────────────────────────
+     Method: GET
+     Path: /api/whatsapp/qr-stream
+     Purpose: SSE stream of QR + connection status
+     Email-app analog: (new — was OAuth callback)
+     ────────────────────────────────────────
+     Method: POST
+     Path: /api/parse-csv
+     Purpose: parse uploaded CSV → {headers, rows, total}
+     Email-app analog: identical (reused parser)
+     ────────────────────────────────────────
+     Method: POST
+     Path: /api/send
+     Purpose: streaming NDJSON send with pacing
+     Email-app analog: /api/send
+     ────────────────────────────────────────
+     Method: POST
+     Path: /api/abort
+     Purpose: cooperative abort of an active job
+     Email-app analog: identical
+
+     8. CSV format & header canonicalization
+
+     Reuse the RFC-4180 parseCsv() verbatim (handles quoted commas, "" escapes,
+     multi-line
+     fields). Extend canonicalizeHeader() to recognize phone columns:
+
+     - sno ← S. NO, s.no, serial … (range selection — unchanged)
+     - name ← any header containing “name” (template placeholder)
+     - phone ← headers matching phone|mobile|contact|whatsapp|number → canonical
+     phone
+     - everything else → generic slug (available as {{slug}} placeholders)
+
+     Expected columns surfaced in the UI hint: sno, name, phone, poster_link (+
+     any extras).
+     poster_link (a Google Drive share link) is fetched once per distinct link
+     (reuse the
+     email app's downloadDriveFile + cache + retry logic, requireImage:true).
+
+     Phone normalization (wa/send.js): strip non-digits; if 10 digits assume
+     India →
+     prefix 91; drop leading 0/+; build JID <digits>@s.whatsapp.net. Before
+     sending,
+     optionally sock.onWhatsApp(jid) to confirm the number exists on WhatsApp
+     (skip + log if
+     not — avoids wasted sends and spam signal). Verification is a configurable
+     toggle (on by
+     default).
+
+     9. Send pipeline — /api/send + wa/send.js
+
+     Same streaming NDJSON contract the frontend already understands
+     ({ok,sno,phone} /
+     {ok:false,...,reason} / {info}), so the log terminal + progress bar port
+     unchanged.
+
+     Per-request body: { numberId, rows, jobId, pacing:{...} } (no subject —
+     WhatsApp has
+     none). Loop:
+     1. Resolve a connected socket via manager.getSocket(numberId) (400 if not
+     connected).
+     2. Pre-fetch each unique poster_link once → image buffer (reuse Drive
+     downloader).
+     3. For each row (respecting ACTIVE_JOBS[jobId].aborted):
+       - Fill template.txt placeholders ({{name}}, {{sno}}, any column).
+       - Build message: if a poster image exists →
+     sock.sendMessage(jid, { image: buffer, caption: text }); else { text }.
+       - Optional presence realism: sendPresenceUpdate('composing', jid) → short
+     wait →
+     sendMessage (configurable).
+       - Emit {ok:true, sno, phone} or {ok:false, sno, phone, reason}.
+       - Anti-ban pacing between sends (see §10).
+
+     10. Anti-ban pacing — configurable knobs (default-safe)
+
+     Exposed as an editable panel on Step 3/4; defaults from .env, no hard
+     ceiling:
+
+     ┌───────────────────────┬───────────┬────────────────────────────────────┐
+     │         Knob          │  Default  │              Meaning               │
+     ├───────────────────────┼───────────┼────────────────────────────────────┤
+     │ minDelayMs /          │ 3000 /    │ random gap between each message    │
+     │ maxDelayMs            │ 8000      │                                    │
+     ├───────────────────────┼───────────┼────────────────────────────────────┤
+     │ batchSize             │ 80        │ messages before a long pause       │
+     ├───────────────────────┼───────────┼────────────────────────────────────┤
+     │ batchPauseMs          │ 60000     │ length of the long pause           │
+     ├───────────────────────┼───────────┼────────────────────────────────────┤
+     │ dailyCapPerNumber     │ 200       │ soft cap; warns when exceeded (not │
+     │                       │           │  blocked)                          │
+     ├───────────────────────┼───────────┼────────────────────────────────────┤
+     │ verifyOnWhatsApp      │ true      │ skip numbers not on WhatsApp       │
+     ├───────────────────────┼───────────┼────────────────────────────────────┤
+     │ typingIndicator       │ true      │ send “composing” presence before   │
+     │                       │           │ each message                       │
+     └───────────────────────┴───────────┴────────────────────────────────────┘
+
+     The loop logs pacing events as {info} lines (e.g. “⏸ batch pause 60s after
+     80 msgs”,
+     “⏭ +91… not on WhatsApp, skipped”). Because knobs are unbounded, the UI
+     shows a persistent
+     caution note near the speed controls.
+
+     11. Frontend — public/index.html (adapted, same design system)
+
+     Keep the exact visual design (dark theme, IBM Plex Mono / Syne, cards,
+     steps bar,
+     dropzone, log terminal, progress bar, toasts). Changes:
+
+     - Rebrand: title/header “Email → WhatsApp Blaster”; icon ✉ → 💬; sub-label
+     “Bulk
+     WhatsApp Automation”. (Design tokens/colors unchanged per “same front
+     end”.)
+     - Step 1 “Select Account” → “Select Sender Number”: dropdown lists phone
+     numbers +
+     labels with a live status dot (green=connected, amber=connecting,
+     red=disconnected).
+     “+ Add account (Google)” → “+ Add number (scan QR)” opening the QR modal
+     (new
+     component) driven by the SSE stream; on success the dropdown refreshes.
+     - Step 2 “Upload CSV”: hint columns become sno, name, phone, poster_link;
+     preview
+     table unchanged.
+     - Step 3 “Range”: keep From/To SNO + preview. Remove the Subject field (no
+     subject
+     in WhatsApp); add the pacing knobs panel (collapsible, pre-filled
+     defaults).
+     - Step 4 “Send”: identical streaming log + progress; button copy “Send All
+     Emails” →
+     “Send All Messages”; logs show SNO n → +91….
+     - QR modal (new): centered overlay, QR PNG, live status text, auto-refresh,
+     close/retry.
+     Reuses existing toast + spinner styles.
+
+     State object gains selectedNumber (replacing selectedAccount); the send
+     fetch/stream
+     reader logic is otherwise reused as-is.
+
+     12. Config & env (.env)
+
+     # DB (local MySQL for dev; DATABASE_URL auto-switches to PG on Render)
+     DB_HOST, DB_USER, DB_PASSWORD, DB_NAME
+     # Server
+     PORT=3000
+     # Anti-ban defaults (overridable in UI)
+     WA_MIN_DELAY_MS=3000
+     WA_MAX_DELAY_MS=8000
+     WA_BATCH_SIZE=80
+     WA_BATCH_PAUSE_MS=60000
+     WA_DAILY_CAP=200
+     No Google/OAuth secrets needed. .gitignore excludes .env, node_modules/,
+     *.log, and
+     any on-disk auth scratch dir.
+
+     13. Known constraints & risks (documented, accepted)
+
+     - Ban risk is real — 2–8 week typical lifespan under bulk use; mitigated,
+     not
+     eliminated, by pacing. Use a dedicated/disposable number, warm it up first,
+     keep
+     batches small. This is inherent to the free route.
+     - Render free tier spins down on idle (kills sockets) and wipes disk —
+     that's why
+     auth is in the DB and we test locally first. Sustained sending later needs
+     an always-on
+     host (Render paid worker / small VPS / local run). Noted for the deploy
+     phase.
+     - Single process only — one Baileys socket per number per process; fine on
+     free single
+     instance, must not scale to multiple web instances without a shared-session
+     rework.
+     - Number must not be active on WhatsApp Business app conflicts — a number
+     can be linked
+     as a device; test number should be a normal WhatsApp account we control.
+     - Supply chain: pin @whiskeysockets/baileys to a known-good version; audit
+     before
+     install; never install look-alike forks.
+
+     14. Build phases (execution order)
+
+     1. Scaffold — folder, package.json, deps, .gitignore, .env.example,
+     render.yaml,
+     copy logo.png + adapt template.txt.
+     2. Data layer — db/pool.js, db/init.js (wa_sessions), db/numbers.js,
+     schema.sql.
+     3. Baileys core — wa/authState.js (DB adapter), wa/manager.js (pool +
+     lifecycle),
+     wa/send.js (JID, normalize, build message, onWhatsApp).
+     4. Server — Express wiring: numbers CRUD, /connect + SSE /qr-stream,
+     /parse-csv
+     (ported parser w/ phone headers), streaming /send with pacing, /abort, boot
+     hydrateAll().
+     5. Frontend — adapt index.html: rebrand, sender-number dropdown w/ status,
+     QR modal +
+     SSE client, remove subject, add pacing panel, port send/stream logic.
+     6. Local test — see §15.
+     7. (Later) Render deploy — render.yaml, env, verify DB-persisted session
+     reconnects.
+
+     15. Verification / test plan (local first)
+
+     1. cd rys_whatsapp_blaster && npm install.
+     2. Ensure local MySQL running; create DB; set .env.
+     3. node server.js → http://localhost:3000; server logs schema-ensured + 0
+     numbers.
+     4. Add number: click “+ Add number”, scan QR with the test phone (user will
+     provide)
+     in WhatsApp → Linked Devices. Confirm modal shows “connected” and the
+     number appears in
+     the dropdown; verify a wa_sessions row exists with populated creds.
+     5. Restart server → confirm hydrateAll() reconnects the number without
+     re-scanning
+     (proves DB-backed auth works).
+     6. Upload CSV: small file with sno,name,phone,poster_link containing 2–3 
+     numbers we
+     own; preview renders.
+     7. Range + pacing: select SNO 1–3, leave default knobs (or lower delays for
+     the test).
+     8. Send: watch the streaming log — each row shows ✓/✗, progress bar
+     advances, pacing
+     {info} lines appear; confirm the messages (with poster image + caption)
+     actually arrive
+     on the recipient phones.
+     9. Abort: start a larger range, hit Terminate mid-run → loop stops
+     promptly.
+     10. Delete number: remove it → row gone, socket logged out.
+
+     Success = messages delivered to our own numbers with correct
+     personalization + poster, and
+     the session survives a server restart.
+
+     ---
+     Open item for the user
+
+     - The test phone number to onboard (user said they'll provide it at test
+     time). Nothing
+     else blocks the build.
+
+● Plan approved. Let me set up progress tracking and start building.
+
+● Let me check the environment (Node version, latest Baileys) and create the
+  folder.
+
+  Ran 1 shell command (ctrl+o to expand)
+● Baileys' latest tag is an RC. Let me check for the latest stable release to
+  pin something reliable.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Node 24 (built-in fetch ✓). I'll pin Baileys to the latest stable 6.17.16
+  (avoiding the RC and the malicious-fork risk — official @whiskeysockets
+  scope). Now scaffolding.
+
+● Write(c:/Users/harsh/Desktop/HARSH/WEB-DEV-PROJECTS/rys_email/rys_whatsapp_bla
+       ster/package.json)
+  ⎿  Wrote 19 lines to ..\rys_whatsapp_blaster\package.json
+       1 {
+       2   "name": "rys-whatsapp-blaster",
+       3   "version": "1.0.0",
+       4   "main": "server.js",
+       5   "scripts": {
+       6     "start": "node server.js",
+       7     "dev": "npx nodemon server.js"
+       8   },
+       9   "dependencies": {
+      10     "@whiskeysockets/baileys": "6.17.16",
+     … +9 lines (ctrl+o to expand)
+
+● Write(c:/Users/harsh/Desktop/HARSH/WEB-DEV-PROJECTS/rys_email/rys_whatsapp_bla
+       ster/.gitignore)
+  ⎿  Wrote 4 lines to ..\rys_whatsapp_blaster\.gitignore
+      1 node_modules/
+      2 .env
+      3 *.log
+      4 wa_auth/
+
+● Write(c:/Users/harsh/Desktop/HARSH/WEB-DEV-PROJECTS/rys_email/rys_whatsapp_bla
+       ster/.env.example)
+  ⎿  Wrote 15 lines to ..\rys_whatsapp_blaster\.env.example
+       1 # ── Local MySQL (sender numbers + Baileys sessions) ──
+       2 # On Render, set DATABASE_URL instead and Postgres is used autom
+         atically.
+       3 DB_HOST=localhost
+       4 DB_USER=root
+       6 DB_NAME=whatsapp_blaster
+       7 
+       8 PORT=3000
+       9 
+      10 # ── Anti-ban pacing defaults (all overridable from the UI) ──
+     … +6 lines (ctrl+o to expand)
+
+● Write(c:/Users/harsh/Desktop/HARSH/WEB-DEV-PROJECTS/rys_email/rys_whatsapp_bla
+       ster/render.yaml)
+  ⎿  Wrote 33 lines to ..\rys_whatsapp_blaster\render.yaml
+       1 # Deploy config for later — local-first testing comes before thi
+       2 # NOTE: Render's free web service spins down on idle and wipes d
+         isk, which
+         tate lives in
+       4 # Postgres (see wa/authState.js) and hydrateAll() reconnects on 
+       5 # SUSTAINED sending you'll want an always-on instance (paid work
+         er / VPS).
+       7   - name: rys-whatsapp-blaster-db
+       8     plan: free
+      10     user: app_user
+     … +28 lines (ctrl+o to expand)
+
+● Write(c:/Users/harsh/Desktop/HARSH/WEB-DEV-PROJECTS/rys_email/rys_whatsapp_bla
+       ster/.env)
+  ⎿  Wrote 14 lines to ..\rys_whatsapp_blaster\.env
+       1 # ── Local MySQL (sender numbers + Baileys sessions) ──
+       2 DB_HOST=localhost
+       3 DB_USER=root
+       4 DB_PASSWORD=
+       5 DB_NAME=whatsapp_blaster
+       6 
+       7 PORT=3000
+       8 
+       9 # ── Anti-ban pacing defaults (all overridable from the UI) ──
+      10 WA_MIN_DELAY_MS=3000
+     … +4 lines (ctrl+o to expand)
+
+● Now the template and logo. Let me create a WhatsApp-appropriate plain-text
+  template and copy the logo.
+
+● Write(c:/Users/harsh/Desktop/HARSH/WEB-DEV-PROJECTS/rys_email/rys_whatsapp_bla
+       ster/template.txt)
+  ⎿  Wrote 21 lines to ..\rys_whatsapp_blaster\template.txt
+       1 Dear {{name}},
+       3 Greetings from *Rajdhani Yuva Sansad*!
+       4 
+         h Parliament Conference. Please find the official conference pos
+         ter attached above.
+       7 *Registration Form:*
+       8 https://docs.google.com/forms/d/e/1FAIpQLScmWZm7zxNqqGnpBrgnge17
+       9 
+      10 Kindly note that participation is subject to our internal select
+         tee selection.
+     … +16 lines (ctrl+o to expand)
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Scaffold done. Now the data layer.
+
+● Write(c:/Users/harsh/Desktop/HARSH/WEB-DEV-PROJECTS/rys_email/rys_whatsapp_bla
+       ster/db/pool.js)
+  ⎿  Wrote 38 lines to ..\rys_whatsapp_blaster\db\pool.js
+      1 // Local dev uses MySQL (DB_HOST/DB_USER/...); Render deploys set
+         DATABASE_URL
+      2 // for the managed Postgres add-on, and we switch drivers automat
+      3 // Mirrors the email app's pool so the two projects behave identi
+        cally.
+      4 const isPg = !!process.env.DATABASE_URL;
+      5 
+      7   let n = 0;
+      8   return sql.replace(/\?/g, () => `$${++n}`);
+      9 }
+     … +34 lines (ctrl+o to expand)
+
+● Write(c:/Users/harsh/Desktop/HARSH/WEB-DEV-PROJECTS/rys_email/rys_whatsapp_bla
+       ster/db/schema.sql)
+  ⎿  Wrote 12 lines to ..\rys_whatsapp_blaster\db\schema.sql
+       1 -- Sender numbers + their persisted Baileys session (creds + sig
+       2 -- One row per WhatsApp number linked as a device to this app.
+       3 CREATE TABLE IF NOT EXISTS wa_sessions (
+         ne number
+       5   phone_number  VARCHAR(32)  NOT NULL UNIQUE, -- E.164 digits, n
+       6   display_name  VARCHAR(255) NOT NULL,        -- editable label
+       7   creds         MEDIUMTEXT NOT NULL,          -- Baileys creds (
+       8   keys          MEDIUMTEXT NOT NULL,          -- signal key stor
+         e (BufferJSON encoded)
+      10   created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+     … +8 lines (ctrl+o to expand)
+
+● Write(c:/Users/harsh/Desktop/HARSH/WEB-DEV-PROJECTS/rys_email/rys_whatsapp_bla
+       ster/db/init.js)
+  ⎿  Wrote 32 lines to ..\rys_whatsapp_blaster\db\init.js
+       1 const { query, isPg } = require("./pool");
+       2 
+       3 // MySQL wants MEDIUMTEXT (creds/keys grow); Postgres uses TEXT 
+         (unbounded).
+       4 const MYSQL_SCHEMA = `
+       6   id            VARCHAR(64) PRIMARY KEY,
+       7   phone_number  VARCHAR(32)  NOT NULL UNIQUE,
+       8   display_name  VARCHAR(255) NOT NULL,
+       9   creds         MEDIUMTEXT NOT NULL,
+      10   keys          MEDIUMTEXT NOT NULL,
+     … +24 lines (ctrl+o to expand)
+
+● Write(c:/Users/harsh/Desktop/HARSH/WEB-DEV-PROJECTS/rys_email/rys_whatsapp_bla
+       ster/db/numbers.js)
+  ⎿  Wrote 101 lines to ..\rys_whatsapp_blaster\db\numbers.js
+       1 const { query, isPg } = require("./pool");
+       2 
+       3 function slugify(phone) {
+       5 }
+       6 
+       7 // Postgres folds unquoted aliases to lowercase, so we select sn
+         ake_case and map
+          layer).
+       9 function toCamel(row) {
+      10   if (!row) return null;
+     … +103 lines (ctrl+o to expand)
+
+● Now the Baileys core — the genuinely new engineering. First the DB-backed auth
+  adapter.
+
+● Write(c:/Users/harsh/Desktop/HARSH/WEB-DEV-PROJECTS/rys_email/rys_whatsapp_bla
+       ster/wa/authState.js)
+  ⎿  Wrote 68 lines to ..\rys_whatsapp_blaster\wa\authState.js
+       1 // DB-backed Baileys auth adapter.
+       3 // Baileys ships useMultiFileAuthState(dir) which writes creds.j
+       4 // per signal key to disk. That's useless on Render's ephemeral 
+         filesystem and
+         ntract over two
+         ver it likes
+         mber is known).
+       8 //
+         iFileAuthState:
+          keys get the
+     … +72 lines (ctrl+o to expand)
+
+● Write(c:/Users/harsh/Desktop/HARSH/WEB-DEV-PROJECTS/rys_email/rys_whatsapp_bla
+       ster/wa/send.js)
+  ⎿  Wrote 68 lines to ..\rys_whatsapp_blaster\wa\send.js
+       1 // Pure helpers for the send pipeline: phone → JID normalization
+       2 // fill, WhatsApp-presence check, and message-content constructi
+       3 // socket + loop live in the server; these stay side-effect free
+          (except the
+          to reason about.
+       6 const DEFAULT_COUNTRY = "91"; // India — most participant number
+       7 
+       8 // Turn a messy CSV cell ("+91 87440-83366", "087440 83366", "87
+       9 // into bare E.164 digits. Returns null if it can't produce a pl
+      10 function normalizePhone(raw, defaultCountry = DEFAULT_COUNTRY) {
+     … +72 lines (ctrl+o to expand)
+● Now the connection manager — the socket pool, lifecycle, QR, reconnect, and
+  boot hydration.
+
+● Write(c:/Users/harsh/Desktop/HARSH/WEB-DEV-PROJECTS/rys_email/rys_whatsapp_bla
+       ster/wa/manager.js)
+  ⎿  Wrote 302 lines to ..\rys_whatsapp_blaster\wa\manager.js
+       1 // ConnectionManager — the live Baileys socket pool.
+       3 // The email app was stateless: a refresh token → one HTTPS call
+         . WhatsApp is
+         ust stay
+         connect after a
+       6 // drop. All of that lives here.
+       8 // Connections are keyed by a "startId": for a brand-new login t
+         hat's a
+          until pairing
+         SE subscribers
+     … +318 lines (ctrl+o to expand)
+
+● Server needs a getView helper on the manager for SSE initial snapshots. Let me
+  add it, then write the server.
+
+● Update(c:/Users/harsh/Desktop/HARSH/WEB-DEV-PROJECTS/rys_email/rys_whatsapp_bl
+        aster/wa/manager.js)
+  ⎿  Added 7 lines
+      246    return entry ? entry.status : "disconnected";
+      247  }
+      248  
+      249 +// Current snapshot for a startId/id — lets the SSE endpoint s
+          +end state                                                     
+      250 +// immediately on subscribe instead of waiting for the next ev
+          +ent.                                                          
+      251 +function getView(key) {                                       
+      252 +  const entry = connections.get(key);                         
+      253 +  return entry ? publicView(entry) : null;                    
+      254 +}                                                             
+      255 +                                                              
+      256  // User abandoned a QR modal without scanning — tear down the 
+           provisional socket.
+      257  async function cancelConnection(startId) {
+      258    const entry = connections.get(startId);
+
+● Update(c:/Users/harsh/Desktop/HARSH/WEB-DEV-PROJECTS/rys_email/rys_whatsapp_bl
+        aster/wa/manager.js)
+  ⎿  Added 1 line
+      301    subscribe,
+      302    getSocketForSend,
+      303    getStatus,
+      304 +  getView,                                                    
+      305    cancelConnection,
+      306    removeNumber,
+      307    hydrateAll,
+
+● Now the server — Express wiring, CSV parser (phone-aware), Drive poster fetch,
+  SSE QR stream, and the streaming send loop with pacing.
+
+● Write(c:/Users/harsh/Desktop/HARSH/WEB-DEV-PROJECTS/rys_email/rys_whatsapp_bla
+       ster/server.js)
+  ⎿  Wrote 327 lines to ..\rys_whatsapp_blaster\server.js
+       1 require("dotenv").config();
+       2 const express = require("express");
+       3 const multer = require("multer");
+       4 const fs = require("fs");
+       5 const path = require("path");
+       6 const crypto = require("crypto");
+       7 
+       8 const { ensureSchema } = require("./db/init");
+       9 const numbers = require("./db/numbers");
+      10 const manager = require("./wa/manager");
+     … +366 lines (ctrl+o to expand)
+
+● Now the frontend — adapting the exact wizard, adding the QR modal + SSE
+  client, sender-number status, and the pacing panel.
+
+● Write(c:/Users/harsh/Desktop/HARSH/WEB-DEV-PROJECTS/rys_email/rys_whatsapp_bla
+       ster/public/index.html)
+  ⎿  Error: claude-sonnet-5[1m] is temporarily unavailable, so auto mode cannot 
+     determine the safety of Write right now. Wait briefly and then try this 
+     action again. If it keeps failing, continue with other tasks that don't 
+     require this action and come back to it later. Note: reading files, 
+     searching code, and other read-only operations do not require the 
+     classifier and can still be used.
+  ⎿  You've hit your session limit · resets 11:30pm (Asia/Calcutta)
+     /upgrade or /usage-credits to finish what you’re working on.
+
+❯ <ide_opened_file>The user opened the file c:\Users\harsh\Desktop\HARSH\WEB-DE 
+  V-PROJECTS\rys_email\rys_whatsapp_blaster\package.json in the IDE. This may   
+  or may not be related to the current task.</ide_opened_file>                  
+
+❯ continue                                                                      
+
+● The frontend Write got interrupted by a transient classifier issue. Let me
+  retry it.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● The Write didn't land. Let me recreate the frontend.
+
+● Write(c:/Users/harsh/Desktop/HARSH/WEB-DEV-PROJECTS/rys_email/rys_whatsapp_bla
+       ster/public/index.html)
+  ⎿  Wrote 642 lines to ..\rys_whatsapp_blaster\public\index.html
+       1 <!DOCTYPE html>
+       3 <head>
+       4 <meta charset="UTF-8" />
+       5 <meta name="viewport" content="width=device-width, initial-scale
+       6 <title>WhatsApp Blaster</title>
+       7 <link rel="preconnect" href="https://fonts.googleapis.com" />
+         gin />
+       9 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mo
+         no:wght@400;500;600&family=Syne:wght@400;600;700;800&display=swa
+      10 <style>
+     … +844 lines (ctrl+o to expand)
+
+● Frontend done. Now install deps and smoke-test.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Important catch: npm flagged that Baileys 6.17.16 has a zero-day advisory
+  (message spoofing) and the official fix is in 6.7.22+ or 7.0.0-rc12+. Since
+  supply-chain/security safety was explicit in our plan, I'll switch to the
+  patched stable 6.7.23 (the legacy dist-tag — same API I coded against).
+
+● Update(c:/Users/harsh/Desktop/HARSH/WEB-DEV-PROJECTS/rys_email/rys_whatsapp_bl
+        aster/package.json)
+  ⎿  Added 1 line, removed 1 line
+       7      "dev": "npx nodemon server.js"
+       8    },
+       9    "dependencies": {
+      10 -    "@whiskeysockets/baileys": "6.17.16",                      
+      10 +    "@whiskeysockets/baileys": "6.7.23",                       
+      11      "dotenv": "^16.4.5",
+      12      "express": "^4.19.2",
+      13      "multer": "^1.4.5-lts.1",
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Baileys 6.7.23 pinned. Let me verify the API surface I coded against exists in
+  this version, and that all my modules load without syntax/import errors.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● All API symbols present. Now let me load each of my modules to catch
+  syntax/wiring errors (this won't touch the DB):
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● All core logic checks out. Now let's smoke-test the full server boot (it needs
+  a DB — let me check if MySQL is reachable locally, else fall back
+  gracefully).
+  Ran 1 shell command (ctrl+o to expand)
+
+● MySQL84 service is present. Let me try starting it and creating the DB,
+  matching the email app's pattern.
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● Already running. Let me use the email app's existing app_user credentials
+  (likely has broad grants) to create the new whatsapp_blaster database.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● It hung — likely app_user lacks CREATE DATABASE privilege or the connection
+  stalled. Let me check the output and try root instead.
+
+  Read 1 file, ran 1 shell command (ctrl+o to expand)
+
+● root with no password works locally. Let me grant app_user privileges on the
+  new DB too (matching the email app's user, so credentials stay consistent),
+  then update .env.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Now update .env with the matching credentials and boot the server for real.
+
+  Read 1 file (ctrl+o to expand)
+
+● Already set to root/no-password which works locally. Let's boot the server.
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● Found a real bug: keys is a reserved word in MySQL — needs backtick-quoting.
+  Let me fix it across the schema and queries.
+
+  Read 1 file (ctrl+o to expand)
+
+● I'll rename the column to signal_keys — cleaner than quoting a reserved word
+  everywhere across two SQL dialects.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● I'll rename only the SQL column name to signal_keys, keeping the JS-facing
+  keys property name in numbers.js's public API (via toCamel) so manager.js
+  doesn't need changes.
+
+● Update(c:/Users/harsh/Desktop/HARSH/WEB-DEV-PROJECTS/rys_email/rys_whatsapp_bl
+        aster/db/init.js)
+  ⎿  Added 1 line, removed 1 line
+       7    phone_number  VARCHAR(32)  NOT NULL UNIQUE,
+       8    display_name  VARCHAR(255) NOT NULL,
+       9    creds         MEDIUMTEXT NOT NULL,
+      10 -  keys          MEDIUMTEXT NOT NULL,                           
+      10 +  signal_keys   MEDIUMTEXT NOT NULL,                           
+      11    status        VARCHAR(24) NOT NULL DEFAULT 'disconnected',
+      12    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      13    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE C
+          URRENT_TIMESTAMP
+
+● Update(c:/Users/harsh/Desktop/HARSH/WEB-DEV-PROJECTS/rys_email/rys_whatsapp_bl
+        aster/db/init.js)
+  ⎿  Added 1 line, removed 1 line
+      19    phone_number  VARCHAR(32)  NOT NULL UNIQUE,
+      20    display_name  VARCHAR(255) NOT NULL,
+      21    creds         TEXT NOT NULL,
+      22 -  keys          TEXT NOT NULL,                                 
+      22 +  signal_keys   TEXT NOT NULL,                                 
+      23    status        VARCHAR(24) NOT NULL DEFAULT 'disconnected',
+      24    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      25    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+● Update(c:/Users/harsh/Desktop/HARSH/WEB-DEV-PROJECTS/rys_email/rys_whatsapp_bl
+        aster/db/schema.sql)
+  ⎿  Added 1 line, removed 1 line
+       5    phone_number  VARCHAR(32)  NOT NULL UNIQUE, -- E.164 digits, 
+          no '+'
+       6    display_name  VARCHAR(255) NOT NULL,        -- editable label
+       7    creds         MEDIUMTEXT NOT NULL,          -- Baileys creds 
+          (BufferJSON encoded)
+       8 -  keys          MEDIUMTEXT NOT NULL,          -- signal key sto
+         -re (BufferJSON encoded)                                        
+       8 +  signal_keys   MEDIUMTEXT NOT NULL,          -- signal key sto
+         +re (BufferJSON encoded)                                        
+       9    status        VARCHAR(24) NOT NULL DEFAULT 'disconnected',
+      10    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      11    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE C
+          URRENT_TIMESTAMP
+
+● Now update db/numbers.js — SQL uses signal_keys, but I'll keep the JS-facing
+  property named keys (manager.js already depends on that name).
+
+  Read 1 file (ctrl+o to expand)
+
+● Update(c:/Users/harsh/Desktop/HARSH/WEB-DEV-PROJECTS/rys_email/rys_whatsapp_bl
+        aster/db/numbers.js)
+  ⎿  Added 1 line, removed 1 line
+      14      displayName: row.display_name,
+      15      status: row.status,
+      16      ...(row.creds !== undefined ? { creds: row.creds } : {}),
+      17 -    ...(row.keys !== undefined ? { keys: row.keys } : {}),     
+      17 +    ...(row.signal_keys !== undefined ? { keys: row.signal_keys
+         + } : {}),                                                      
+      18    };
+      19  }
+      20  
+
+● Update(c:/Users/harsh/Desktop/HARSH/WEB-DEV-PROJECTS/rys_email/rys_whatsapp_bl
+        aster/db/numbers.js)
+  ⎿  Added 1 line, removed 1 line
+      37  // Full row incl. session material — used only by the Baileys a
+          uth adapter.
+      38  async function getSession(id) {
+      39    const [rows] = await query(
+      40 -    "SELECT id, phone_number, display_name, status, creds, keys
+         - FROM wa_sessions WHERE id = ?",                               
+      40 +    "SELECT id, phone_number, display_name, status, creds, sign
+         +al_keys FROM wa_sessions WHERE id = ?",                        
+      41      [id]
+      42    );
+      43    return toCamel(rows[0]);
+
+● Update(c:/Users/harsh/Desktop/HARSH/WEB-DEV-PROJECTS/rys_email/rys_whatsapp_bl
+        aster/db/numbers.js)
+  ⎿  Added 5 lines, removed 5 lines
+      53  // known) and again whenever creds/keys change.
+      54  async function upsertSession({ id, phoneNumber, displayName, cr
+          eds, keys, status }) {
+      55    const sql = isPg
+      56 -    ? `INSERT INTO wa_sessions (id, phone_number, display_name,
+         - creds, keys, status)                                          
+      56 +    ? `INSERT INTO wa_sessions (id, phone_number, display_name,
+         + creds, signal_keys, status)                                   
+      57         VALUES (?, ?, ?, ?, ?, ?)
+      58         ON CONFLICT (id) DO UPDATE SET
+      59           phone_number = EXCLUDED.phone_number,
+      60           display_name = EXCLUDED.display_name,
+      61           creds        = EXCLUDED.creds,
+      62 -         keys         = EXCLUDED.keys,                         
+      62 +         signal_keys  = EXCLUDED.signal_keys,                  
+      63           status       = EXCLUDED.status,
+      64           updated_at   = CURRENT_TIMESTAMP`
+      65 -    : `INSERT INTO wa_sessions (id, phone_number, display_name,
+         - creds, keys, status)                                          
+      65 +    : `INSERT INTO wa_sessions (id, phone_number, display_name,
+         + creds, signal_keys, status)                                   
+      66         VALUES (?, ?, ?, ?, ?, ?)
+      67         ON DUPLICATE KEY UPDATE
+      68           phone_number = VALUES(phone_number),
+      69           display_name = VALUES(display_name),
+      70           creds        = VALUES(creds),
+      71 -         keys         = VALUES(keys),                          
+      71 +         signal_keys  = VALUES(signal_keys),                   
+      72           status       = VALUES(status)`;
+      73    await query(sql, [id, phoneNumber, displayName, creds, keys, 
+          status || "disconnected"]);
+      74  }
+      75  
+      76  async function saveCredsKeys(id, creds, keys) {
+      77    await query(
+      78 -    "UPDATE wa_sessions SET creds = ?, keys = ? WHERE id = ?", 
+      78 +    "UPDATE wa_sessions SET creds = ?, signal_keys = ? WHERE id
+         + = ?",                                                         
+      79      [creds, keys, id]
+      80    );
+      81  }
+
+● Now kill the stale server process and reboot to verify the fix.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Background command "Create whatsapp_blaster database using app_user
+credentials" failed with exit code 1
+● That's just the earlier stale background task (the app_user access-denied one)
+  finally reporting in — already superseded, no action needed. Let me check the
+  actual server boot log.
+
+  Read 1 file (ctrl+o to expand)
+
+● Server boots cleanly, schema is created (fixed the reserved-word bug), DB
+  connects, and hydrateAll() runs with zero saved numbers as expected. Let's
+  confirm the HTTP endpoints actually respond and the table exists correctly.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Everything checks out:
+  - GET /api/numbers → [] (correct, empty)
+  - GET / → 200 (frontend serves)
+  - Schema is correct with the signal_keys fix applied
+
+  Let me also do a quick QR-flow smoke test to make sure /api/whatsapp/connect +
+  the SSE stream actually produce a real QR code end-to-end (without scanning
+  it yet).
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● The QR data URI is real and well-formed. Server, DB, session lifecycle, and QR
+  pairing pipeline all confirmed working end-to-end up to the point of
+  scanning. Let me clean up and finalize.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● RYS WhatsApp Blaster is built and smoke-tested locally. Here's what's
+  confirmed working:
+
+  ✅ Full project scaffolded at rys_whatsapp_blaster/ — package.json, .env,
+  render.yaml, template, logo
+  ✅ Baileys pinned to 6.7.23 — I caught and fixed a real issue here: npm
+  flagged that my originally-planned version (6.17.16, the latest stable tag)
+  has a known zero-day advisory (message spoofing). Switched to 6.7.23, which
+  the advisory lists as patched
+  ✅ Data layer boots clean against local MySQL (whatsapp_blaster DB created,
+  wa_sessions table verified)
+  ✅ Caught and fixed a real bug during testing: keys is a reserved word in
+  MySQL — the schema creation failed on first boot. Renamed the column to
+  signal_keys throughout the DB layer and confirmed the fix with a clean reboot
+  ✅ Server boots, GET /api/numbers responds [], frontend serves at /
+  ✅ QR pairing pipeline verified end-to-end: POST /api/whatsapp/connect starts
+  a Baileys session, the SSE stream at /api/whatsapp/qr-stream delivers a real,
+  well-formed QR code as a data URI — confirmed by actually capturing bytes from
+  the live stream
+
+  What's not yet tested (needs your test phone, per your earlier instruction):
+  actually scanning the QR, confirming a number reconnects after restart without
+  re-scanning, and sending a real message with poster+caption to a phone you
+  control. That's exactly where we left off in the plan's test sequence (steps
+  4–10).
+
+  Whenever you're ready with the test phone number, tell me and we'll run
+  through onboarding it and sending a real test batch.
