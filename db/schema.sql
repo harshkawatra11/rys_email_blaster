@@ -35,3 +35,22 @@ CREATE TABLE IF NOT EXISTS global_posters (
   updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   KEY idx_global_posters_position (position)
 );
+
+-- One row per gmail.send attempt (rolling 24h usage + invalid_grant detection).
+CREATE TABLE IF NOT EXISTS send_log (
+  id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+  email       VARCHAR(255) NOT NULL,
+  ok          TINYINT(1) NOT NULL,
+  error_code  VARCHAR(32),
+  created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY idx_send_log_email_created (email, created_at)
+);
+
+-- All-time per-email counters (survive log pruning and "Clear all tokens").
+CREATE TABLE IF NOT EXISTS send_totals (
+  email         VARCHAR(255) PRIMARY KEY,
+  total_calls   INTEGER NOT NULL DEFAULT 0,
+  total_ok      INTEGER NOT NULL DEFAULT 0,
+  total_failed  INTEGER NOT NULL DEFAULT 0,
+  last_call_at  TIMESTAMP NULL
+);

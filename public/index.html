@@ -348,6 +348,47 @@
   .poster-link-row input { flex: 1; }
   .poster-link-row input.error { border-color: var(--danger); }
   .dropzone.compact { padding: 18px 16px; margin-bottom: 10px; }
+
+  /* ── Small buttons / danger hover ── */
+  .btn-sm { padding: 7px 14px; font-size: 0.7rem; }
+  .btn-danger:hover { background: rgba(244,63,94,0.2); }
+  .btn-danger:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  /* ── Per-account usage panel ── */
+  .usage-list { display: flex; flex-direction: column; gap: 8px; }
+  .usage-row {
+    display: grid; grid-template-columns: minmax(0, 1fr) 150px auto; gap: 14px; align-items: center;
+    background: var(--bg); border: 1px solid var(--border2); border-radius: 8px;
+    padding: 10px 14px; font-size: 0.75rem;
+  }
+  .usage-row.selected { border-color: var(--accent); }
+  .usage-email { color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .usage-sub { color: var(--muted); font-size: 0.68rem; margin-top: 3px; line-height: 1.5; }
+  .usage-bar { height: 6px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .usage-bar > div { height: 100%; background: var(--accent2); transition: width 0.3s ease; }
+  .usage-bar.warn > div { background: var(--accent3); }
+  .usage-bar.danger > div { background: var(--danger); }
+  .usage-count { text-align: right; color: var(--text); font-weight: 600; white-space: nowrap; }
+  .usage-badge {
+    display: inline-block; font-size: 0.62rem; padding: 1px 7px; border-radius: 10px;
+    margin-left: 8px; border: 1px solid; vertical-align: middle;
+  }
+  .usage-badge.ok     { color: var(--accent2); border-color: rgba(74,222,128,0.35); }
+  .usage-badge.warn   { color: var(--accent3); border-color: rgba(249,115,22,0.4); }
+  .usage-badge.danger { color: var(--danger);  border-color: rgba(244,63,94,0.4); }
+  .usage-badge.muted  { color: var(--muted);   border-color: var(--border2); }
+  .usage-empty { color: var(--muted); font-size: 0.75rem; }
+  @media (max-width: 640px) {
+    .usage-row { grid-template-columns: 1fr; }
+    .usage-count { text-align: left; }
+  }
+
+  /* ── Step 4 cap warning ── */
+  .cap-warn {
+    background: rgba(249,115,22,0.08); border: 1px solid rgba(249,115,22,0.35);
+    color: var(--accent3); border-radius: 8px; padding: 10px 14px;
+    font-size: 0.75rem; line-height: 1.6; margin-bottom: 16px;
+  }
 </style>
 </head>
 <body>
@@ -381,8 +422,14 @@
       <div class="acc-badge"><div class="acc-dot"></div><span id="accEmail"></span></div>
     </div>
     <div class="btn-group mt-12">
+      <button class="btn btn-danger btn-sm" id="clearTokensBtn" type="button"
+              title="Deletes every stored Google refresh token so every sender can sign in fresh">Clear all tokens</button>
       <button class="btn btn-ghost" id="addAccountBtn" onclick="addAccount()">+ Add account (Continue with Google)</button>
     </div>
+    <p class="poster-note" style="margin-top:10px; text-align:right;">
+      Sends failing with <code style="color:var(--accent)">invalid_grant</code>? Click "Clear all tokens", then have each sender click
+      "+ Add account" and pick <strong>their own</strong> Google account in the chooser.
+    </p>
 
     <!-- Message template editor -->
     <div class="tpl-section">
@@ -401,6 +448,20 @@
       <div class="tpl-chips" id="tplChips"></div>
 
       <div id="tplEditor" contenteditable="true" spellcheck="true" data-placeholder="Paste or type your email template here…"></div>
+    </div>
+
+    <!-- Per-account Gmail API usage -->
+    <div class="tpl-section" id="usageSection">
+      <div class="tpl-section-head">
+        <div class="card-label" style="margin-bottom:0; flex:1;">Gmail API Usage (per account)</div>
+        <button type="button" class="tpl-btn" id="usageRefreshBtn">↻ Refresh</button>
+      </div>
+      <p class="poster-note">
+        Every email sent is one <code style="color:var(--accent)">gmail.send</code> API call. A regular Gmail account can send about
+        <strong id="usageLimitLabel">500</strong> emails per rolling 24 hours — bars turn amber at 80% and red at 95%.
+        Sending is never blocked by the app; this is for planning which account to use.
+      </p>
+      <div id="usageList" class="usage-list"><div class="usage-empty">Loading usage…</div></div>
     </div>
 
     <!-- Global poster fallback (repeatable list) -->
@@ -497,6 +558,7 @@
       <div class="stat-chip purple">Account <strong id="sendAccLabel">—</strong></div>
       <div class="stat-chip green">Recipients <strong id="sendCount">—</strong></div>
     </div>
+    <div class="cap-warn hidden" id="sendCapWarn"></div>
 
     <div class="progress-outer hidden" id="progressWrap">
       <div class="progress-inner" id="progressBar" style="width:0%"></div>
@@ -834,6 +896,111 @@ async function loadSettings() {
   }
 }
 
+// ── Per-account Gmail API usage ───────────────────────────────────────────
+const usageState = { limit: 500, byEmail: {} };
+
+function fmtAge(seconds) {
+  if (seconds === null || seconds === undefined) return '—';
+  const s = Math.max(0, Math.round(seconds));
+  if (s < 60) return 'just now';
+  if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+  if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
+  return `${Math.floor(s / 86400)}d ago`;
+}
+
+// Google expires refresh tokens for "Testing"-mode OAuth apps after 7 days.
+function tokenBadge(u) {
+  if (!u.connected) return { cls: 'muted', text: 'not connected' };
+  if (u.tokenExpired) return { cls: 'danger', text: 'token expired — reconnect' };
+  const days = (u.tokenAgeSeconds || 0) / 86400;
+  if (days >= 7) return { cls: 'danger', text: `token ${Math.floor(days)}d old — likely expired` };
+  if (days >= 5) return { cls: 'warn', text: `token ${Math.floor(days)}d old` };
+  return { cls: 'ok', text: 'connected' };
+}
+
+function renderUsage() {
+  const list = document.getElementById('usageList');
+  document.getElementById('usageLimitLabel').textContent = usageState.limit;
+  const items = Object.values(usageState.byEmail);
+  if (!items.length) {
+    list.innerHTML = '<div class="usage-empty">No accounts connected and no sends recorded yet.</div>';
+    return;
+  }
+  const selectedEmail = state.selectedAccount ? state.selectedAccount.email : null;
+  list.innerHTML = items.map(u => {
+    const pct = Math.min(100, (u.sent24h / usageState.limit) * 100);
+    const level = pct >= 95 ? 'danger' : pct >= 80 ? 'warn' : '';
+    const badge = tokenBadge(u);
+    return `<div class="usage-row${u.email === selectedEmail ? ' selected' : ''}">
+      <div>
+        <div class="usage-email">${escapeHtml(u.email)}<span class="usage-badge ${badge.cls}">${escapeHtml(badge.text)}</span></div>
+        <div class="usage-sub">24h: ${Number(u.sent24h)} sent · ${Number(u.failed24h)} failed
+          &nbsp;|&nbsp; All-time: ${Number(u.totalCalls)} calls (${Number(u.totalOk)} ok, ${Number(u.totalFailed)} failed)
+          &nbsp;|&nbsp; Last call: ${fmtAge(u.lastCallAgeSeconds)}</div>
+      </div>
+      <div class="usage-bar ${level}"><div style="width:${pct.toFixed(1)}%"></div></div>
+      <div class="usage-count">${Number(u.sent24h)} / ${Number(usageState.limit)}</div>
+    </div>`;
+  }).join('');
+}
+
+async function loadUsage() {
+  try {
+    const res = await fetch('/api/usage');
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to load usage');
+    usageState.limit = Number(data.limit) || 500;
+    usageState.byEmail = {};
+    data.accounts.forEach(u => { usageState.byEmail[u.email] = u; });
+    renderUsage();
+  } catch (err) {
+    document.getElementById('usageList').innerHTML =
+      `<div class="usage-empty">Could not load usage: ${escapeHtml(err.message)}</div>`;
+  }
+}
+
+document.getElementById('usageRefreshBtn').addEventListener('click', loadUsage);
+
+// ── Clear all tokens (two-click confirm, no native dialog) ────────────────
+const clearTokensBtn = document.getElementById('clearTokensBtn');
+let clearArmTimer = null;
+
+function disarmClearBtn() {
+  clearTimeout(clearArmTimer);
+  delete clearTokensBtn.dataset.armed;
+  clearTokensBtn.textContent = 'Clear all tokens';
+}
+
+clearTokensBtn.addEventListener('click', async () => {
+  if (!clearTokensBtn.dataset.armed) {
+    clearTokensBtn.dataset.armed = '1';
+    clearTokensBtn.textContent = 'Click again to confirm';
+    clearArmTimer = setTimeout(disarmClearBtn, 5000);
+    return;
+  }
+  clearTimeout(clearArmTimer);
+  clearTokensBtn.disabled = true;
+  clearTokensBtn.textContent = 'Clearing…';
+  try {
+    const res = await fetch('/api/accounts/clear-all', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ confirm: 'CLEAR_ALL_TOKENS' }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Clear failed');
+    state.selectedAccount = null;
+    await loadAccounts();
+    await loadUsage();
+    toast(`Cleared ${data.cleared} token(s). Ask each sender to click "+ Add account" and sign in again.`, 'success');
+  } catch (err) {
+    toast('Failed to clear tokens: ' + err.message, 'error');
+  } finally {
+    clearTokensBtn.disabled = false;
+    disarmClearBtn();
+  }
+});
+
 // ── Accounts (loaded dynamically from MySQL via the server) ──────────────
 async function loadAccounts(preselectEmail) {
   const sel = document.getElementById('accountSelect');
@@ -845,12 +1012,13 @@ async function loadAccounts(preselectEmail) {
 
     if (state.accounts.length === 0) {
       sel.innerHTML = '<option value="">— no accounts yet, click "Add account" —</option>';
+      onAccountChange(); // hides the stale badge + disables Continue after "Clear all tokens"
       return;
     }
 
     sel.innerHTML = '<option value="">— select an account —</option>';
     state.accounts.forEach(acc => {
-      sel.innerHTML += `<option value="${acc.id}">${acc.email}</option>`;
+      sel.innerHTML += `<option value="${escapeHtml(acc.id)}">${escapeHtml(acc.email)}</option>`;
     });
 
     if (preselectEmail) {
@@ -889,6 +1057,7 @@ function addAccount() {
   }
 
   loadSettings();
+  loadUsage();
 })();
 
 // ── Step navigation ───────────────────────────────────────────────────────
@@ -903,7 +1072,10 @@ function goStep(n) {
     else if (s < n) el.classList.add('done');
   });
 
-  if (n === 4) updateSendSummary();
+  if (n === 4) {
+    updateSendSummary();
+    loadUsage().then(updateSendSummary); // re-check the cap with fresh numbers
+  }
   state.currentStep = n;
 }
 
@@ -924,6 +1096,7 @@ function onAccountChange() {
     info.classList.add('hidden');
     next.disabled = true;
   }
+  renderUsage();
 }
 
 // ── Step 2 ────────────────────────────────────────────────────────────────
@@ -1004,8 +1177,30 @@ function previewRange() {
 
 // ── Step 4 ────────────────────────────────────────────────────────────────
 function updateSendSummary() {
+  if (!state.selectedAccount) return;
   document.getElementById('sendAccLabel').textContent = state.selectedAccount.label;
   document.getElementById('sendCount').textContent = state.selectedRows.length;
+
+  // Warn only — never block. Gmail enforces ~limit sends per rolling 24h.
+  const warn = document.getElementById('sendCapWarn');
+  const email = state.selectedAccount.email;
+  const u = usageState.byEmail[email];
+  const used = u ? Number(u.sent24h) || 0 : 0;
+  const batch = state.selectedRows.length;
+  const after = used + batch;
+  const limit = usageState.limit;
+  if (u && u.tokenExpired) {
+    warn.textContent = `⚠ The Google token for ${email} looks expired (last send failed with invalid_grant). Go back to Step 1, click "+ Add account" and sign in as ${email} before sending.`;
+    warn.classList.remove('hidden');
+  } else if (after > limit) {
+    warn.textContent = `⚠ ${email} has already sent ${used} in the last 24h. This batch of ${batch} would take it to ${after} / ${limit} — Gmail will likely start rejecting sends partway through. Consider a smaller SNO range or a different account.`;
+    warn.classList.remove('hidden');
+  } else if (after >= limit * 0.8) {
+    warn.textContent = `Heads up: after this batch ${email} will be at ${after} / ${limit} sends for the last 24h.`;
+    warn.classList.remove('hidden');
+  } else {
+    warn.classList.add('hidden');
+  }
 }
 
 let currentAbortController = null;
@@ -1078,6 +1273,7 @@ async function sendEmails() {
     let buffer = "";
     let sentCount = 0;
     let failCount = 0;
+    let fatalMsg = null;
     const total = state.selectedRows.length;
 
     while (true) {
@@ -1094,6 +1290,12 @@ async function sendEmails() {
 
           if (r.info) {
             logLine('info', r.info);
+            continue;
+          }
+
+          if (r.fatal) {
+            fatalMsg = r.fatal;
+            logLine('fail', '⛔ ' + r.fatal);
             continue;
           }
 
@@ -1119,7 +1321,8 @@ async function sendEmails() {
     sendBtn.classList.add('btn-success');
     sendBtn.onclick = sendEmails;
     document.getElementById('sendAnotherBtn').classList.remove('hidden');
-    toast(`${sentCount} emails sent!`, 'success');
+    if (fatalMsg) toast(fatalMsg, 'error');
+    else toast(`${sentCount} emails sent!`, 'success');
 
   } catch (e) {
     if (e.name === 'AbortError') {
@@ -1138,6 +1341,7 @@ async function sendEmails() {
     backBtn.disabled = false;
   } finally {
     currentAbortController = null;
+    loadUsage();
   }
 }
 

@@ -7,8 +7,10 @@ const { google } = require("googleapis");
 const accountsDb = require("./db/accounts");
 const settingsDb = require("./db/settings");
 const globalPostersDb = require("./db/globalPosters");
+const usageDb = require("./db/usage");
 const { ensureSchema } = require("./db/init");
 const { sanitizeTemplateHtml } = require("./lib/sanitizeConfig");
+const { classifySendError } = require("./lib/sendErrors");
 
 const app    = express();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -24,6 +26,9 @@ const imageUpload = multer({
 });
 
 const MAX_GLOBAL_POSTERS = 6; // bounds per-email size (see buildRawMessage)
+// Consumer Gmail allows ~500 sends per rolling 24h (Workspace: 2000). Used
+// only for display/warnings — sending is never blocked by the app.
+const GMAIL_DAILY_LIMIT = Number(process.env.GMAIL_DAILY_LIMIT) || 500;
 const MAX_LINKS_PER_ROW = 10; // bounds a crafted client payload's outbound fetches
 
 app.use(express.json({ limit: "1mb" }));
@@ -291,6 +296,77 @@ app.delete("/api/accounts/:id", async (req, res) => {
   }
 });
 
+// ── Usage (per-email gmail.send counters) ─────────────────────────────────
+// Merges connected accounts with usage history. Emails that have history but
+// no stored token (e.g. after "Clear all tokens") are returned with
+// connected:false so their counters stay visible.
+app.get("/api/usage", async (req, res) => {
+  try {
+    const [accounts, summary] = await Promise.all([
+      accountsDb.listAccountsWithAge(),
+      usageDb.getUsageSummary(),
+    ]);
+
+    const byEmail = new Map();
+    const ensure = (email) => {
+      if (!byEmail.has(email)) {
+        byEmail.set(email, {
+          email,
+          displayName: email.split("@")[0],
+          connected: false,
+          accountId: null,
+          tokenAgeSeconds: null,
+          tokenExpired: false,
+          sent24h: 0,
+          failed24h: 0,
+          totalCalls: 0,
+          totalOk: 0,
+          totalFailed: 0,
+          lastCallAgeSeconds: null,
+        });
+      }
+      return byEmail.get(email);
+    };
+
+    for (const a of accounts) {
+      Object.assign(ensure(a.email), {
+        displayName: a.displayName,
+        connected: true,
+        accountId: a.id,
+        tokenAgeSeconds: a.tokenAgeSeconds,
+      });
+    }
+    for (const r of summary.recent) {
+      Object.assign(ensure(r.email), {
+        sent24h: Number(r.ok_24h) || 0,
+        failed24h: Number(r.failed_24h) || 0,
+      });
+    }
+    for (const t of summary.totals) {
+      Object.assign(ensure(t.email), {
+        totalCalls: Number(t.total_calls) || 0,
+        totalOk: Number(t.total_ok) || 0,
+        totalFailed: Number(t.total_failed) || 0,
+        lastCallAgeSeconds: t.last_call_age_s === null || t.last_call_age_s === undefined ? null : Number(t.last_call_age_s),
+      });
+    }
+    // Token is "expired" if the latest invalid_grant happened AFTER the token
+    // was last stored (i.e. nobody has reconnected since it died).
+    for (const g of summary.grants) {
+      const u = ensure(g.email);
+      const grantAge = Number(g.grant_age_s);
+      u.tokenExpired = u.connected && (u.tokenAgeSeconds === null || grantAge < u.tokenAgeSeconds);
+    }
+
+    const list = [...byEmail.values()].sort(
+      (a, b) => Number(b.connected) - Number(a.connected) || a.email.localeCompare(b.email)
+    );
+    res.json({ limit: GMAIL_DAILY_LIMIT, accounts: list });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to load usage: " + err.message });
+  }
+});
+
 // ── Settings (message template + global poster fallback list) ─────────────
 app.get("/api/settings", async (req, res) => {
   try {
@@ -390,7 +466,11 @@ app.get("/api/oauth/start", (req, res) => {
   const oauth2 = makeOAuthClient();
   const url = oauth2.generateAuthUrl({
     access_type: "offline",
-    prompt: "consent",
+    // select_account: without it Google silently reuses whichever account the
+    // browser is already signed into, so "logging in again" stored a fresh
+    // token for the wrong sender and the stale row was never replaced.
+    // consent: guarantees Google returns a new refresh_token every time.
+    prompt: "consent select_account",
     scope: [GMAIL_SEND_SCOPE, USERINFO_EMAIL_SCOPE],
   });
   res.redirect(url);
@@ -526,10 +606,41 @@ app.post("/api/abort", (req, res) => {
   res.json({ ok: true });
 });
 
+// ── Clear all tokens ──────────────────────────────────────────────────────
+// Deletes every stored refresh token so every sender can sign in fresh.
+// Tokens are revoked at Google first (best-effort, 5s cap each) so the old
+// grants are dead too. Usage counters (send_log/send_totals) are kept — they
+// are keyed by email, not by account row.
+app.post("/api/accounts/clear-all", async (req, res) => {
+  if (req.body?.confirm !== "CLEAR_ALL_TOKENS") {
+    return res.status(400).json({ error: "Missing confirmation" });
+  }
+  if (Object.keys(ACTIVE_JOBS).length > 0) {
+    return res.status(409).json({ error: "A send batch is still running — terminate it before clearing tokens" });
+  }
+  try {
+    const accounts = await accountsDb.listAccountsWithTokens();
+    const results = await Promise.allSettled(
+      accounts.map((a) =>
+        Promise.race([
+          makeOAuthClient().revokeToken(a.refreshToken),
+          new Promise((_, reject) => setTimeout(() => reject(new Error("revoke timeout")), 5000)),
+        ])
+      )
+    );
+    const revoked = results.filter((r) => r.status === "fulfilled").length;
+    await accountsDb.deleteAllAccounts();
+    console.log(`[INFO] Cleared ${accounts.length} account token(s) (${revoked} revoked at Google)`);
+    res.json({ ok: true, cleared: accounts.length, revoked });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to clear tokens: " + err.message });
+  }
+});
+
 app.post("/api/send", async (req, res) => {
   const { accountId, rows, subject, jobId } = req.body;
   const acc = await accountsDb.getAccountById(accountId);
-  if (!acc) return res.status(400).json({ error: "Unknown account" });
+  if (!acc) return res.status(400).json({ error: "Unknown account — it may have been cleared. Reload the page and pick an account again." });
   if (!CLIENT_ID || !CLIENT_SECRET)
     return res.status(500).json({ error: "GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET missing in .env" });
 
@@ -563,6 +674,10 @@ app.post("/api/send", async (req, res) => {
     ACTIVE_JOBS[jobId] = { aborted: false };
   }
 
+  // try/finally guarantees the job entry is removed and the response ends
+  // even if something throws mid-batch — otherwise "Clear all tokens" would
+  // think a batch is still running until the server restarts.
+  try {
   // Pre-fetch each distinct poster link once (not per-row) across every
   // numbered poster_link* column — a CSV of 200 rows sharing one poster
   // link would otherwise retry the same failing download hundreds of times
@@ -605,7 +720,7 @@ app.post("/api/send", async (req, res) => {
   }
 
   for (let i = 0; i < rows.length; i++) {
-    if (jobId && ACTIVE_JOBS[jobId].aborted) {
+    if (jobId && ACTIVE_JOBS[jobId]?.aborted) {
       console.log(`[INFO] Job ${jobId} aborted by client. Stopping at SNO ${rows[i].sno}`);
       break;
     }
@@ -631,18 +746,34 @@ app.post("/api/send", async (req, res) => {
       posterImages:    postersToSend,
     });
 
+    let stopBatch = false;
     try {
       await gmail.users.messages.send({ userId: "me", requestBody: { raw } });
+      await usageDb.recordSend({ email: acc.email, ok: true });
       res.write(JSON.stringify({ ok: true, sno: row.sno, email: row.email }) + "\n");
     } catch (err) {
+      const errorCode = classifySendError(err);
+      await usageDb.recordSend({ email: acc.email, ok: false, errorCode });
       res.write(JSON.stringify({ ok: false, sno: row.sno, email: row.email, reason: err.message }) + "\n");
+      if (errorCode === "invalid_grant") {
+        // A dead refresh token fails every remaining row identically —
+        // stop now instead of burning 2s per row on guaranteed failures.
+        res.write(JSON.stringify({
+          fatal: `The Google token for ${acc.email} is expired or revoked (invalid_grant). Batch stopped at SNO ${row.sno}. Click "+ Add account", choose ${acc.email} in Google's account picker, then resend from SNO ${row.sno}.`,
+        }) + "\n");
+        stopBatch = true;
+      }
     }
+    if (stopBatch) break;
 
     // Wait 2 seconds after each email — skip delay after the last one
     if (i < rows.length - 1) await delay(EMAIL_DELAY);
   }
-
-  res.end();
+  } finally {
+    if (jobId) delete ACTIVE_JOBS[jobId];
+    usageDb.pruneOldLogs();
+    res.end();
+  }
 });
 
 // Multer errors (oversize/invalid upload) should come back as JSON, not
@@ -661,6 +792,7 @@ app.listen(PORT, async () => {
   console.log(`\n✉  Email Blaster → http://localhost:${PORT}`);
   try {
     await ensureSchema();
+    await usageDb.pruneOldLogs();
     const accounts = await accountsDb.listAccounts();
     if (accounts.length === 0) {
       console.log(`   No accounts yet — click "Add account" in the app to sign in with Google.\n`);
